@@ -22,17 +22,13 @@ public class BoatAction {
     public Map<String, Object> getDocumentValues(){
         actionDBValues= new HashMap<>();
         //actionDBValues.put("name", actionName);
-        actionDBValues.put("target", actionTarget);
+        //actionDBValues.put("target", actionTarget);
         actionDBValues.put("current", actionCurrent);
         return actionDBValues;
     }
 
 
     public boolean isActionComplete(){
-
-        if(actionCurrent == actionTarget){
-            return true;
-        }
-        return false;
+        return (actionCurrent == actionTarget);
     }
 }

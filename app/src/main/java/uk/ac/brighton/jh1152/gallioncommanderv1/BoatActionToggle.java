@@ -6,7 +6,7 @@ import android.widget.Button;
 import android.widget.TableLayout;
 
 
-public class BoatActionToggle implements BaseBoatActionUI{
+public class BoatActionToggle implements IBaseBoatActionUI {
 
 
     Boat lBoat;
@@ -34,10 +34,11 @@ public class BoatActionToggle implements BaseBoatActionUI{
         });
     }
 
-
-    private void setTextValue(){
-       String buttonTextPrefix = action.states[isToggled ? 1: 0];
-       String buttonText =  buttonTextPrefix + " " + action.actionName;
+    @Override
+    public void setTextValue(){
+        isToggled = (action.actionCurrent == 1);
+       String buttonTextPrefix = action.states[isToggled ? 0: 1];
+       String buttonText =  buttonTextPrefix + " the " + action.actionName;
        button.setText((CharSequence) buttonText);
     }
 
@@ -46,7 +47,7 @@ public class BoatActionToggle implements BaseBoatActionUI{
         isToggled = !isToggled;
        // lBoat.setActionValue(actionPos, action.actionCurrent);
         lBoat.setActionValue(action.documentReference, isToggled ? 1: 0);
-        setTextValue();
+        //setTextValue();
         return isToggled;
     }
 }

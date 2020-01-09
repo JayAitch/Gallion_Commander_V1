@@ -1,20 +1,27 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.Debug;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
+import java.lang.reflect.Array;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MainGameActivity extends AppCompatActivity {
@@ -22,44 +29,44 @@ public class MainGameActivity extends AppCompatActivity {
     String gameID = "EiDo3HKycS8ckYxdMNGw";
     FirebaseFirestore db;
     HashMap<String, BoatAction> activities;
+    HashMap<String, IBaseBoatActionUI> boatActionButtons;
+
+
+    TextView instructionTextDisplay;
+    HashMap.Entry<String, String> currentInstruction;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = FirebaseFirestore.getInstance();
         setContentView(R.layout.game_layout);
+        instructionTextDisplay = findViewById(R.id.instruction_text);
         GetActions();
-        //boat = new Boat(0, gameID); // persist this object between states
-        //createActionButtons(boat.getActions());
     }
 
-
-    private void createActionButtons(BoatAction actions[]){
-        int iterator = 0;
-
-        for (BoatAction boatAction : actions) {
-            Log.d("game activitive", "" + iterator);
-            BaseBoatActionUI newUIAction = new BoatActionToggle(this, boat, iterator, boatAction);
-            iterator++;
-        }
-    }
 
 
     private void createActionButtons(HashMap<String,BoatAction> actions){
         int iterator = 0;
+        boatActionButtons = new HashMap<>();
 
         for (Map.Entry<String, BoatAction> entry: actions.entrySet()) {
             Log.d("game activitive", "" + iterator);
 
-            BaseBoatActionUI newUIAction = new BoatActionToggle(this, boat, iterator, entry.getValue());
-            iterator++;
+            IBaseBoatActionUI newUIAction = new BoatActionToggle(this, boat, iterator, entry.getValue());
+            boatActionButtons.put(entry.getKey(),newUIAction);
         }
     }
+
+
 
     private void GetActions(){
         /// probably waant a single object with exlusive db access
         CollectionReference actionscollection = db.collection("boats/EiDo3HKycS8ckYxdMNGw/activities");
 
         activities = new HashMap<>();
+
+        // concider moving this to snapshot added method
         actionscollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -72,9 +79,21 @@ public class MainGameActivity extends AppCompatActivity {
                         int target = (int)(long) document.get("target");
                         int current = (int)(long) document.get("current");
                        // String[] states = (ArrayList<>) document.get("states");
-                        String[] states = {"off", "on"};
-                        BoatAction tempAction = new BoatAction(activityKey,target,current,document.getId(),states);
+
+                        List<String> statesMap =  (List<String>) document.get("states");
+
+                        String[] stateActions = new String[statesMap.size()];
+
+                        int iterator = 0;
+                        for (String state : statesMap) {
+                            stateActions[iterator] = state;
+                            iterator++;
+                        }
+
+
+                        BoatAction tempAction = new BoatAction(activityKey,target,current,document.getId(),stateActions);
                         activities.put(document.getId(),tempAction);
+
                     }
 
                 } else {
@@ -82,9 +101,76 @@ public class MainGameActivity extends AppCompatActivity {
                 }
                 boat = new Boat(activities, gameID);
                 createActionButtons(activities);
+                UpdateUI();
             }
         });
+        actionscollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                    for(DocumentChange change: queryDocumentSnapshots.getDocumentChanges()){
+                        switch (change.getType()){
+                        case MODIFIED:
+
+                            boat.setActionValue(change.getDocument().getId(),(int)(long) change.getDocument().get("current"));
+
+                            UpdateUI();
+                    }
+                }
+            }
+        });
+
     }
+
+    private void UpdateUI(){
+
+        for (Map.Entry<String, IBaseBoatActionUI> entry: boatActionButtons.entrySet()) {
+            IBaseBoatActionUI UIAction = entry.getValue();
+            UIAction.setTextValue();
+        }
+
+        if (currentInstruction != null && !boat.isShipComplete()) {
+
+             if (!boat.isInstructionPossible(currentInstruction.getKey())) {
+                currentInstruction = boat.getNewInstruction();
+                Log.d("<<<<<<<<<<<<<<<", "instruction is" + currentInstruction.getValue());
+                displayCurrentInstruction();
+
+            }
+
+         } else {
+            currentInstruction = boat.getNewInstruction();
+            displayCurrentInstruction();
+        }
+        displayCurrentInstruction();
+    }
+
+
+    private void displayCurrentInstruction(){
+        if(boat.isShipComplete()){
+            instructionTextDisplay.setText("complete");
+        }
+        else{
+            if(currentInstruction != null) {
+                instructionTextDisplay.setText(currentInstruction.getValue());
+            }
+
+
+
+        }
+
+
+    }
+
+
+    private void UpdateUI(String key){
+
+
+    }
+
+
+
+
+
 
 
     @Override
