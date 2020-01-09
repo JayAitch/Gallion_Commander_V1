@@ -10,7 +10,6 @@ public class BoatActionToggle implements IBaseBoatActionUI {
 
 
     Boat lBoat;
-
     BoatAction action;
     boolean isToggled;
     Button button;

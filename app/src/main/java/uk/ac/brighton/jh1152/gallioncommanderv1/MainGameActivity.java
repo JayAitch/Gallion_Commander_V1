@@ -52,8 +52,14 @@ public class MainGameActivity extends AppCompatActivity {
 
         for (Map.Entry<String, BoatAction> entry: actions.entrySet()) {
             Log.d("game activitive", "" + iterator);
+            IBaseBoatActionUI newUIAction;
+            if(entry.getValue().states.length > 2){
+                // consider not adding states at all
+                newUIAction = new BoatActionSlider(this, boat, iterator, entry.getValue());
+            }else{
+                newUIAction = new BoatActionToggle(this, boat, iterator, entry.getValue());
+            }
 
-            IBaseBoatActionUI newUIAction = new BoatActionToggle(this, boat, iterator, entry.getValue());
             boatActionButtons.put(entry.getKey(),newUIAction);
         }
     }
@@ -79,16 +85,23 @@ public class MainGameActivity extends AppCompatActivity {
                         int target = (int)(long) document.get("target");
                         int current = (int)(long) document.get("current");
                        // String[] states = (ArrayList<>) document.get("states");
+                        String[] stateActions;
 
-                        List<String> statesMap =  (List<String>) document.get("states");
 
-                        String[] stateActions = new String[statesMap.size()];
+                            List<String> statesMap =  (List<String>) document.get("states");
+                            stateActions= new String[statesMap.size()];
+                            int iterator = 0;
+                            for (String state : statesMap) {
+                                stateActions[iterator] = state;
+                                iterator++;
+                            }
 
-                        int iterator = 0;
-                        for (String state : statesMap) {
-                            stateActions[iterator] = state;
-                            iterator++;
-                        }
+
+
+
+
+
+
 
 
                         BoatAction tempAction = new BoatAction(activityKey,target,current,document.getId(),stateActions);
