@@ -9,20 +9,27 @@ import android.util.Log;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainGameActivity extends AppCompatActivity {
     Boat boat;
-    String gameID = "CpSBjqsXuGt9b9wdLYDi";
+    String gameID = "EiDo3HKycS8ckYxdMNGw";
+    FirebaseFirestore db;
+    HashMap<String, BoatAction> activities;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("game activitive<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<", "create called<<<<<<<");
-        Log.w("game activitive<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<", "create called<<<<<<<");
+        db = FirebaseFirestore.getInstance();
         setContentView(R.layout.game_layout);
-        boat = new Boat(0, gameID); // persist this object between states
-        createActionButtons(boat.getActions());
+        GetActions();
+        //boat = new Boat(0, gameID); // persist this object between states
+        //createActionButtons(boat.getActions());
     }
 
 
@@ -31,35 +38,50 @@ public class MainGameActivity extends AppCompatActivity {
 
         for (BoatAction boatAction : actions) {
             Log.d("game activitive", "" + iterator);
-            BaseBoatActionUI newUIAction = new BoatActionToggle(this, boat,iterator, boatAction);
+            BaseBoatActionUI newUIAction = new BoatActionToggle(this, boat, iterator, boatAction);
+            iterator++;
+        }
+    }
+
+
+    private void createActionButtons(HashMap<String,BoatAction> actions){
+        int iterator = 0;
+
+        for (Map.Entry<String, BoatAction> entry: actions.entrySet()) {
+            Log.d("game activitive", "" + iterator);
+
+            BaseBoatActionUI newUIAction = new BoatActionToggle(this, boat, iterator, entry.getValue());
             iterator++;
         }
     }
 
     private void GetActions(){
-        CollectionReference actionscollection = db.collection("games/CpSBjqsXuGt9b9wdLYDi/actions");
+        /// probably waant a single object with exlusive db access
+        CollectionReference actionscollection = db.collection("boats/EiDo3HKycS8ckYxdMNGw/activities");
+
+        activities = new HashMap<>();
         actionscollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+
                 if (task.isSuccessful()) {
-                    currentActions = new BoatAction[task.getResult().size()];
 
                     for (QueryDocumentSnapshot document : task.getResult()) {
-
-
-                        String name = document.get("name").toString();
-                        int target = (int)(long)document.get("target");
-                        int current = (int)(long)document.get("current");
-                        //          currentActions[itterator] = new BoatAction(name, target, current, document.getId());
-                        MainActivity.CustomButton newButton = new MainActivity.CustomButton(itterator, content);
-                        layout.addView(newButton);
-                        itterator++;
+                        String activityKey = (String) document.get("name");
+                        int target = (int)(long) document.get("target");
+                        int current = (int)(long) document.get("current");
+                       // String[] states = (ArrayList<>) document.get("states");
+                        String[] states = {"off", "on"};
+                        BoatAction tempAction = new BoatAction(activityKey,target,current,document.getId(),states);
+                        activities.put(document.getId(),tempAction);
                     }
 
                 } else {
 
                 }
-
+                boat = new Boat(activities, gameID);
+                createActionButtons(activities);
             }
         });
     }

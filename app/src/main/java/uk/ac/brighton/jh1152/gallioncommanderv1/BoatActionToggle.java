@@ -44,7 +44,8 @@ public class BoatActionToggle implements BaseBoatActionUI{
     @Override
     public Boolean SetBoatAction() {
         isToggled = !isToggled;
-        lBoat.setActionValue(actionPos, action.actionCurrent);
+       // lBoat.setActionValue(actionPos, action.actionCurrent);
+        lBoat.setActionValue(action.documentReference, isToggled ? 1: 0);
         setTextValue();
         return isToggled;
     }
