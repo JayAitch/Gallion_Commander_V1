@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
         Log.w("dfdf>>>>>>>>>>>>>>>>>>", "value inside" + pos);
         BoatAction action = currentActions[pos];
         action.actionCurrent = 0;
-        String actionDocId = action.docRef;
+        String actionDocId = action.documentReference;
 
         Log.w("dfdf>>>>>>>>>>>>>>>>>>", "docid" + actionDocId);
         //new BoatAction("walk the plank", 1, 1);

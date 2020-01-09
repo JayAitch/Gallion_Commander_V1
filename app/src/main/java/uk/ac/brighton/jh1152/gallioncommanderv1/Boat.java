@@ -21,7 +21,6 @@ public class Boat {
 
 
 
-
     private void createActions(){
         String[] states = {"lower","raise"};
         actions = new BoatAction[2];
@@ -33,6 +32,9 @@ public class Boat {
         actions[1] = new BoatAction("cutless lads!", 1, 0, "1", Arrays.copyOf(states, 2));
     }
 
+    private void createAction(){
+
+    }
 
     public boolean setActionValue(int pos, int value){
         BoatAction changingAction = actions[pos];

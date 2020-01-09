@@ -6,7 +6,7 @@ import java.util.Map;
 public class BoatAction {
     int actionCurrent;
     int actionTarget;
-    String docRef;
+    String documentReference;
     String actionName;
     Map<String, Object> actionDBValues;
     String states[];
@@ -15,7 +15,7 @@ public class BoatAction {
         actionName = name;
         actionTarget = target;
         actionCurrent = current;
-        docRef = ref;
+        documentReference = ref;
         states = stateNames;
     }
 
