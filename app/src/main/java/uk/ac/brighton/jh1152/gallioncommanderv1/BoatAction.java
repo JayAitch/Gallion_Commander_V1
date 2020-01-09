@@ -9,12 +9,14 @@ public class BoatAction {
     String docRef;
     String actionName;
     Map<String, Object> actionDBValues;
+    String states[];
 
-    public BoatAction(String name, int target, int current, String ref){
+    public BoatAction(String name, int target, int current, String ref, String stateNames[]){
         actionName = name;
         actionTarget = target;
         actionCurrent = current;
         docRef = ref;
+        states = stateNames;
     }
 
     public Map<String, Object> getDocumentValues(){
@@ -24,6 +26,7 @@ public class BoatAction {
         actionDBValues.put("current", actionCurrent);
         return actionDBValues;
     }
+
 
     public boolean isActionComplete(){
 

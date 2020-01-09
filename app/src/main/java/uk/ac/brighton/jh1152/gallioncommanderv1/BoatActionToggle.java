@@ -12,15 +12,27 @@ public class BoatActionToggle implements BaseBoatActionUI{
     int actionPosition;
     Boat lBoat;
     int currentValue;
-//consider passing object in, we may beable to remove boat reference
-    public BoatActionToggle(Activity activity, Boat boat, int position, int value, CharSequence buttonText) {
+    String buttonTextSuffix;
+    String stateNames[];
+    boolean isToggled;
+    Button button;
+
+    //consider passing object in, we may beable to remove boat reference
+    public BoatActionToggle(Activity activity, Boat boat, int position, int value, String buttonText, String onOffStateNames[]) {
         lBoat = boat;
         actionPosition = position;
         currentValue = value;
-        Button button = new Button(activity);
+        stateNames = onOffStateNames;
+        buttonTextSuffix = buttonText;
+
+
+        button = (Button) new Button(activity);
         TableLayout layout = (TableLayout) activity.findViewById(R.id.tableLayout);
         layout.addView(button);
-        button.setText(buttonText);
+        setTextValue();
+
+
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -28,12 +40,22 @@ public class BoatActionToggle implements BaseBoatActionUI{
                 SetBoatAction();
             }
         });
+
+
     }
 
+    private void setTextValue(){
+       String buttonTextPrefix = stateNames[isToggled ? 1: 0];
+
+        String buttonText =  buttonTextPrefix + " " + buttonTextSuffix;
+        button.setText((CharSequence) buttonText);
+    }
 
     @Override
     public Boolean SetBoatAction() {
+        isToggled = !isToggled;
         lBoat.setActionValue(actionPosition, currentValue);
-        return false;
+        setTextValue();
+        return isToggled;
     }
 }

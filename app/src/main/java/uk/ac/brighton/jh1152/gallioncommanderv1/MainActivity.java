@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                         String name = document.get("name").toString();
                         int target = (int)(long)document.get("target");
                         int current = (int)(long)document.get("current");
-                        currentActions[itterator] = new BoatAction(name, target, current, document.getId());
+              //          currentActions[itterator] = new BoatAction(name, target, current, document.getId());
                         CustomButton newButton = new CustomButton(itterator, content);
                         layout.addView(newButton);
                         itterator++;
@@ -218,8 +218,8 @@ public class MainActivity extends AppCompatActivity {
 
                         // this is going to want to be an array of actions
 
-                        currentActions[0] = new BoatAction("raise the jolly rodger!", 1, 0, "1212d1d1d");
-                        currentActions[1] = new BoatAction("walk the plank", 1, 0, "dsvsv2");
+             //           currentActions[0] = new BoatAction("raise the jolly rodger!", 1, 0, "1212d1d1d");
+             //           currentActions[1] = new BoatAction("walk the plank", 1, 0, "dsvsv2");
 
                         CollectionReference actionsCollection = db.collection("games/" + documentReference.getId() + "/actions/");
 

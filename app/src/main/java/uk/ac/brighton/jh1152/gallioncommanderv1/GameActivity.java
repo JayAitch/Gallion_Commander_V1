@@ -28,7 +28,7 @@ public class GameActivity extends Activity {
 
         for (BoatAction boatAction : actions) {
             Log.d("game activitive", "" + iterator);
-            BaseBoatActionUI newUIAction = new BoatActionToggle(this, boat, iterator, boatAction.actionCurrent, (CharSequence) "dfgfd");
+            BaseBoatActionUI newUIAction = new BoatActionToggle(this, boat, iterator, boatAction.actionCurrent,  "dfgfd",  boatAction.states);
             iterator++;
         }
     }

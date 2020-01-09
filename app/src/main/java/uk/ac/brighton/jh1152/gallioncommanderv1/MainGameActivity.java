@@ -23,7 +23,7 @@ public class MainGameActivity extends AppCompatActivity {
 
         for (BoatAction boatAction : actions) {
             Log.d("game activitive", "" + iterator);
-            BaseBoatActionUI newUIAction = new BoatActionToggle(this, boat, iterator, boatAction.actionCurrent, (CharSequence) boatAction.actionName);
+            BaseBoatActionUI newUIAction = new BoatActionToggle(this, boat, iterator, boatAction.actionCurrent,  boatAction.actionName,  boatAction.states);
             iterator++;
         }
     }
