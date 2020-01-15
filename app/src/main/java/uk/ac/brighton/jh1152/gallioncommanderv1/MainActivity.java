@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         createActionsFromSnapshot();
     }
 
-
+/**
 
     void setupLobbyScreen(){
         Button joinBtn = (Button) findViewById(R.id.joinBtn);
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
+**/
 
     int itterator = 0;
     Button[] button;

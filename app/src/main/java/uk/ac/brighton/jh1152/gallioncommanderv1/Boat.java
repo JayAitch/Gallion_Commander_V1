@@ -20,14 +20,16 @@ public class Boat {
     private FirebaseFirestore database;
     private CollectionReference actionsCollection;
     FirebaseFirestore db; // probably not here
-
+    private Random random;
 
     public Boat(HashMap<String,BoatAction> actions , String documentReference){
         docRef = documentReference;
         this.actions = actions;
         db = FirebaseFirestore.getInstance();
         possibleInstructions = new HashMap<>();
+        random = new Random();
         setPossibleInstructions();
+
     }
 
 
@@ -89,14 +91,20 @@ public class Boat {
     public HashMap.Entry<String, String> getNewInstruction(){
 
         int mapSize = possibleInstructions.entrySet().size();
+        Log.d("<<<<<<<<<<<<","size:     " + mapSize);
 
         int iterator = 0;
         HashMap.Entry<String, String> chosenInstruction = new AbstractMap.SimpleEntry<>("", "");
-        if(mapSize > 0) {
-            int position = new Random().nextInt(mapSize);
+        if(mapSize  > 0) {
+            int position = random.nextInt(mapSize);
+
+            Log.d("<<<<<<<<<<<<","position:     " + position);
+
             for (Map.Entry<String, String> instruction : possibleInstructions.entrySet()) {
-                if (iterator == position) ;
-                chosenInstruction = instruction;
+                if (iterator == position){
+                    chosenInstruction = instruction;
+                }
+
                 iterator++;
             }
         }
