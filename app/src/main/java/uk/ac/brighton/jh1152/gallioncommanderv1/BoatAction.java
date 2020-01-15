@@ -1,5 +1,8 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,9 +24,10 @@ public class BoatAction {
 
     public Map<String, Object> getDocumentValues(){
         actionDBValues= new HashMap<>();
-        //actionDBValues.put("name", actionName);
-        //actionDBValues.put("target", actionTarget);
+        actionDBValues.put("name", actionName);
+        actionDBValues.put("target", actionTarget);
         actionDBValues.put("current", actionCurrent);
+        actionDBValues.put("states", Arrays.asList(states));
         return actionDBValues;
     }
 

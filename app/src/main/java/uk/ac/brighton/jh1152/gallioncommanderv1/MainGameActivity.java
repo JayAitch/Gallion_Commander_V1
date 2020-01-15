@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Debug;
 import android.util.Log;
@@ -26,7 +27,8 @@ import java.util.Map;
 
 public class MainGameActivity extends AppCompatActivity {
     Boat boat;
-    String gameID = "EiDo3HKycS8ckYxdMNGw";
+    String gameID;// = "EiDo3HKycS8ckYxdMNGw";
+    int playerNumner;
     FirebaseFirestore db;
     HashMap<String, BoatAction> activities;
     HashMap<String, IBaseBoatActionUI> boatActionButtons;
@@ -34,10 +36,17 @@ public class MainGameActivity extends AppCompatActivity {
 
     TextView instructionTextDisplay;
     HashMap.Entry<String, String> currentInstruction;
+    public static final String EXTRA_MESSAGE  = "uk.ac.brighton.jh1152.gallioncommanderv1.MESSAGE";
+   // public static final String EXTRA_PLAYER_NUMBER = "uk.ac.brighton.jh1152.gallioncommanderv1.MESSAGE";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        gameID = intent.getStringExtra(MainGameActivity.EXTRA_MESSAGE);
+      // playerNumner = intent.getIntExtra(MainGameActivity.EXTRA_PLAYER_NUMBER, -1);
+
         db = FirebaseFirestore.getInstance();
         setContentView(R.layout.game_layout);
         instructionTextDisplay = findViewById(R.id.instruction_text);
@@ -68,7 +77,7 @@ public class MainGameActivity extends AppCompatActivity {
 
     private void GetActions(){
         /// probably waant a single object with exlusive db access
-        CollectionReference actionscollection = db.collection("boats/EiDo3HKycS8ckYxdMNGw/activities");
+        CollectionReference actionscollection = db.collection("boats/"+gameID+"/activities");
 
         activities = new HashMap<>();
 
@@ -117,6 +126,9 @@ public class MainGameActivity extends AppCompatActivity {
                 UpdateUI();
             }
         });
+
+
+
         actionscollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {

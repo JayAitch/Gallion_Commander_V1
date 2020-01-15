@@ -87,7 +87,7 @@ public class Boat {
         return possibleInstructions.entrySet().isEmpty();
     }
 
-
+   // have a look https://firebase.google.com/docs/firestore/manage-data/add-data
     public HashMap.Entry<String, String> getNewInstruction(){
 
         int mapSize = possibleInstructions.entrySet().size();
