@@ -1,10 +1,12 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,6 +23,11 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +41,7 @@ public class LobbyActivity extends AppCompatActivity {
     TextView lobbySizeText;
     TextView lobbyPositionText;
     TextView lobbyCodeText;
+    ImageView lobbyQRCode;
     Button startGameBtn;
     DocumentReference lobbyDocument;
     Map<String, Object> lobbyData;
@@ -54,6 +62,7 @@ public class LobbyActivity extends AppCompatActivity {
         lobbyCodeText = (TextView) findViewById(R.id.lobbyIDText);
         lobbyPositionText = (TextView) findViewById(R.id.lobbyPositionText);
         lobbySizeText = (TextView) findViewById(R.id.lobbySizeText);
+        lobbyQRCode = (ImageView) findViewById(R.id.lobby_qr_code);
         startGameBtn = (Button) findViewById(R.id.start_game_button);
         db = FirebaseFirestore.getInstance();
         lobbyDocument = db.collection("games").document(lobbyID);
@@ -82,7 +91,7 @@ public class LobbyActivity extends AppCompatActivity {
                                 lobbyData.remove("boat");
                                 lobbyData.put("players", FieldValue.increment(1));
                                 lobbyDocument.update(lobbyData);
-
+                                generateAndDisplayQRCode(document.getId());
 
                                 thisPlayerNumber = document.get("players", Integer.class);
                                 lobbyPositionText.setText(String.valueOf(thisPlayerNumber));
@@ -204,7 +213,21 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
 
+    private void generateAndDisplayQRCode(String code)
+    {
+        Bitmap qrCodeBitmap;
+        MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+        try{
+            BitMatrix bitMatrix = multiFormatWriter.encode(code, BarcodeFormat.QR_CODE, 400, 400);
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            qrCodeBitmap = barcodeEncoder.createBitmap(bitMatrix);
+            lobbyQRCode.setImageBitmap(qrCodeBitmap);
+        }catch (WriterException e){
+            e.printStackTrace();
+        }
 
+
+    }
     private void CheckIfFinishedCreatingActions(int activitesCount){
         if(boatActions.length == activitesCount){
             lobbyData.put("boat", newBoatReferenceID);
