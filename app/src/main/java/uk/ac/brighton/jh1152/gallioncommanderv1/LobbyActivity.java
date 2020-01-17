@@ -39,7 +39,7 @@ public class LobbyActivity extends AppCompatActivity {
     Map<String, Object> lobbyData;
     WriteBatch activitiesBatch;
     int thisPlayerNumber;
-    public static final String EXTRA_BOAT_ID = "uk.ac.brighton.jh1152.gallioncommanderv1.MESSAGE";
+    public static final String EXTRA_BOAT_ID = "uk.ac.brighton.jh1152.gallioncommanderv1.BOATID";
     //public static final String EXTRA_PLAYER_NUMBER = "uk.ac.brighton.jh1152.gallioncommanderv1.PLAYERS";
 
 
@@ -47,6 +47,9 @@ public class LobbyActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        lobbyID = intent.getStringExtra(LandingActivity.EXTRA_LOBBY_ID);
+
         setContentView(R.layout.lobby_layout);
         lobbyCodeText = (TextView) findViewById(R.id.lobbyIDText);
         lobbyPositionText = (TextView) findViewById(R.id.lobbyPositionText);

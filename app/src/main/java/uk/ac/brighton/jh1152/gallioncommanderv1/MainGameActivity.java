@@ -36,7 +36,7 @@ public class MainGameActivity extends AppCompatActivity {
 
     TextView instructionTextDisplay;
     HashMap.Entry<String, String> currentInstruction;
-    public static final String EXTRA_MESSAGE  = "uk.ac.brighton.jh1152.gallioncommanderv1.MESSAGE";
+    //public static final String EXTRA_MESSAGE  = "uk.ac.brighton.jh1152.gallioncommanderv1.BOATID";
    // public static final String EXTRA_PLAYER_NUMBER = "uk.ac.brighton.jh1152.gallioncommanderv1.MESSAGE";
 
 
@@ -44,7 +44,7 @@ public class MainGameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        gameID = intent.getStringExtra(MainGameActivity.EXTRA_MESSAGE);
+        gameID = intent.getStringExtra(LobbyActivity.EXTRA_BOAT_ID);
       // playerNumner = intent.getIntExtra(MainGameActivity.EXTRA_PLAYER_NUMBER, -1);
 
         db = FirebaseFirestore.getInstance();
