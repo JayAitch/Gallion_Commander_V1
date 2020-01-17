@@ -1,6 +1,7 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
@@ -23,7 +24,7 @@ public class BoatActionToggle implements IBaseBoatActionUI {
         button = (Button) new Button(activity);
         TableLayout layout = (TableLayout) activity.findViewById(R.id.tableLayout);
         layout.addView(button);
-        setTextValue();
+        //setTextValue();
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,6 +45,7 @@ public class BoatActionToggle implements IBaseBoatActionUI {
     @Override
     public Boolean SetBoatAction() {
         isToggled = !isToggled;
+        Log.d("<<<<<<<<<<<<<", "toggle spamming<<<<<<<<<<<<");
        // lBoat.setActionValue(actionPos, action.actionCurrent);
         lBoat.setActionValue(action.documentReference, isToggled ? 1: 0);
         //setTextValue();

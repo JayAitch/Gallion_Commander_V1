@@ -187,14 +187,6 @@ public class MainGameActivity extends AppCompatActivity {
     }
 
 
-    private void UpdateUI(String key){
-
-
-    }
-
-
-
-
 
 
 

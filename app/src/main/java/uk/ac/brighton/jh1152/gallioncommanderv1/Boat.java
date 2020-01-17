@@ -43,6 +43,8 @@ public class Boat {
         return changingAction.isActionComplete();
     }
 
+
+
     void setDocumentValue(BoatAction action){
         db.collection("boats/" + docRef +"/activities")
                 .document(action.documentReference).update(action.getDocumentValues())
