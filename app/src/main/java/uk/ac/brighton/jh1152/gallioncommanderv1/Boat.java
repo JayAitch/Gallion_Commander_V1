@@ -1,13 +1,20 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -53,28 +60,51 @@ public class Boat {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        setPossibleInstructions();
+                       // setPossibleInstructions();
                     }
                 });
     }
 
 
-    // method is being called too many times
+    // method is being called too many timesd
+//    private void setPossibleInstructions(){
+//
+//        for (Map.Entry<String, BoatAction> entry: actions.entrySet()) {
+//                BoatAction boatAction = entry.getValue();
+//                if(boatAction.isActionComplete()){
+//                    possibleInstructions.remove(entry.getKey());
+//                }
+//                else{
+//                    String instructionText = boatAction.states[boatAction.actionTarget] +" the "+ boatAction.actionName  ;
+//                    Log.d("<<<<<<<<<<<<<", "instructionText:  "  + instructionText);
+//                    possibleInstructions.put(entry.getKey(), instructionText);
+//                }
+//        }
+//    }
     private void setPossibleInstructions(){
+        CollectionReference actionscollection = db.collection("boats/"+ docRef +"/activities");
+        // concider moving this to snapshot added method
+        actionscollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-        for (Map.Entry<String, BoatAction> entry: actions.entrySet()) {
-                BoatAction boatAction = entry.getValue();
-                if(boatAction.isActionComplete()){
-                    possibleInstructions.remove(entry.getKey());
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        if(document.get("current") == document.get("target")){
+                            possibleInstructions.remove(document.getId());
+                        }
+                        else{
+                            int stateNumber = document.get("target", Integer.class);
+                            List<String> states = (List<String>) document.get("states");
+                            String stateName = states.get(stateNumber);
+                            String instructionText = stateName +" the "+ document.get("name")  ;
+                            possibleInstructions.put(document.getId(), instructionText);
+                        }
+                    }
                 }
-                else{
-                    String instructionText = boatAction.states[boatAction.actionTarget] +" the "+ boatAction.actionName  ;
-                    Log.d("<<<<<<<<<<<<<", "instructionText:  "  + instructionText);
-                    possibleInstructions.put(entry.getKey(), instructionText);
-                }
-        }
+            }
+        });
     }
-
 
     public boolean isInstructionPossible(String key){
         if(key == "") return false;
@@ -91,6 +121,7 @@ public class Boat {
         return possibleInstructions.entrySet().isEmpty();
     }
 
+    // seperate instructons and actions this is shuit
    // have a look https://firebase.google.com/docs/firestore/manage-data/add-data
     public HashMap.Entry<String, String> getNewInstruction(){
 
@@ -108,7 +139,6 @@ public class Boat {
                 if (iterator == position){
                     chosenInstruction = instruction;
                 }
-
                 iterator++;
             }
         }

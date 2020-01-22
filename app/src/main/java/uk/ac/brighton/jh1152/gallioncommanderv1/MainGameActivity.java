@@ -147,9 +147,8 @@ public class MainGameActivity extends AppCompatActivity {
                                     BoatAction tempAction = new BoatAction(activityKey, target, current, document.getId(), stateActions);
                                     activities.put(document.getId(), tempAction);
 
-
-
                                 }
+
                                 documentCount++;
                             }
 
