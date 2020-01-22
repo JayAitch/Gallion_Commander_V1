@@ -48,7 +48,7 @@ public class LobbyActivity extends AppCompatActivity {
     WriteBatch activitiesBatch;
     int thisPlayerNumber;
     public static final String EXTRA_BOAT_ID = "uk.ac.brighton.jh1152.gallioncommanderv1.BOATID";
-    //public static final String EXTRA_PLAYER_NUMBER = "uk.ac.brighton.jh1152.gallioncommanderv1.PLAYERS";
+    public static final String EXTRA_PLAYER_NUMBER = "uk.ac.brighton.jh1152.gallioncommanderv1.PLAYERNUMBER";
 
 
     @Override
@@ -92,8 +92,8 @@ public class LobbyActivity extends AppCompatActivity {
                                 lobbyData.put("players", FieldValue.increment(1));
                                 lobbyDocument.update(lobbyData);
                                 generateAndDisplayQRCode(document.getId());
-
                                 thisPlayerNumber = document.get("players", Integer.class);
+
                                 lobbyPositionText.setText(String.valueOf(thisPlayerNumber));
 
                             } else {
@@ -130,7 +130,7 @@ public class LobbyActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainGameActivity.class);
         String boatIdMessage = boatID;
         intent.putExtra(EXTRA_BOAT_ID, boatIdMessage);
-        //intent.putExtra(EXTRA_PLAYER_NUMBER, thisPlayerNumber);
+        intent.putExtra(EXTRA_PLAYER_NUMBER, thisPlayerNumber);
         startActivity(intent);
     }
 
@@ -186,7 +186,7 @@ public class LobbyActivity extends AppCompatActivity {
     private void createNewBoatAndSetReference(){
         Map<String, Object> newBoat = new HashMap<>();
         newBoat.put("lives", 10);
-
+        newBoat.put("players", lobbyData.get("players"));
 
 
         db.collection("boats").add(newBoat).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {

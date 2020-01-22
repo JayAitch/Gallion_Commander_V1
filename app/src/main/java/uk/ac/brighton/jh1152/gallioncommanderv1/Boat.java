@@ -36,11 +36,13 @@ public class Boat {
     public boolean setActionValue(String key, int value){
         BoatAction changingAction = actions.get(key);
 
+        if(changingAction != null){
+            changingAction.actionCurrent = value;
+            setDocumentValue(changingAction);
 
-        changingAction.actionCurrent = value;
-        setDocumentValue(changingAction);
-
-        return changingAction.isActionComplete();
+            return changingAction.isActionComplete();
+        }
+        return false;
     }
 
 

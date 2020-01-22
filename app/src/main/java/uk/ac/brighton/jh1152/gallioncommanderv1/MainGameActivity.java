@@ -14,6 +14,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -28,7 +30,7 @@ import java.util.Map;
 public class MainGameActivity extends AppCompatActivity {
     Boat boat;
     String gameID;// = "EiDo3HKycS8ckYxdMNGw";
-    int playerNumner;
+    int playerNumber;
     FirebaseFirestore db;
     HashMap<String, BoatAction> activities;
     HashMap<String, IBaseBoatActionUI> boatActionButtons;
@@ -45,8 +47,8 @@ public class MainGameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         gameID = intent.getStringExtra(LobbyActivity.EXTRA_BOAT_ID);
-      // playerNumner = intent.getIntExtra(MainGameActivity.EXTRA_PLAYER_NUMBER, -1);
-
+         playerNumber = intent.getIntExtra(LobbyActivity.EXTRA_PLAYER_NUMBER, -1);
+         Log.d("<<<<<<<<<<<<<<<<<<<", "player number"+ playerNumber);
         db = FirebaseFirestore.getInstance();
         setContentView(R.layout.game_layout);
         instructionTextDisplay = findViewById(R.id.instruction_text);
@@ -73,59 +75,94 @@ public class MainGameActivity extends AppCompatActivity {
         }
     }
 
+    float playerSize;
+    float actionRoleMax = 0;
+    float actionRoleMin = 0;
+    float stepsPerUser;
+    float actionsSize;
+    int documentCount;
 
 
     private void GetActions(){
         /// probably waant a single object with exlusive db access
-        CollectionReference actionscollection = db.collection("boats/"+gameID+"/activities");
+
+
 
         activities = new HashMap<>();
 
-        // concider moving this to snapshot added method
-        actionscollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+        DocumentReference boatDocument = db.document("boats/" + gameID);
+
+        boatDocument.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                     @Override
+                                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                         DocumentSnapshot document = task.getResult();
+                                                         playerSize = document.get("players", Integer.class);
+
+                CollectionReference actionscollection = db.collection("boats/"+gameID+"/activities");
+                // concider moving this to snapshot added method
+                actionscollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
 
-                if (task.isSuccessful()) {
+                        if (task.isSuccessful()) {
 
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        String activityKey = (String) document.get("name");
-                        int target = (int)(long) document.get("target");
-                        int current = (int)(long) document.get("current");
-                       // String[] states = (ArrayList<>) document.get("states");
-                        String[] stateActions;
+                            //not like this
+                            actionsSize = task.getResult().size();
+                            stepsPerUser  =  (actionsSize/ (playerSize + 1));
+
+                            Log.d("<<<<<<<<calc", "playersuze:  " + playerSize +"apparent ssize:  " + actionsSize);
+                            actionRoleMin =  stepsPerUser * playerNumber;
+                            actionRoleMax =  actionRoleMin + stepsPerUser;
 
 
-                            List<String> statesMap =  (List<String>) document.get("states");
-                            stateActions= new String[statesMap.size()];
-                            int iterator = 0;
-                            for (String state : statesMap) {
-                                stateActions[iterator] = state;
-                                iterator++;
+                            Log.d("<<<<<<<<calc", "size: " + actionsSize + " pos: " + playerNumber +" players: " + playerSize + " spu: " + stepsPerUser + " Role:" + actionRoleMin +" - "+ actionRoleMax + "cond1: " + (documentCount >= actionRoleMin) + "cond2: " + (documentCount <= actionRoleMax));
+                            int documentCount = 0;
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+
+
+                                if(documentCount >= actionRoleMin && documentCount <= actionRoleMax){
+                                    String activityKey = (String) document.get("name");
+                                    int target = (int) (long) document.get("target");
+                                    int current = (int) (long) document.get("current");
+                                    // String[] states = (ArrayList<>) document.get("states");
+                                    String[] stateActions;
+
+
+                                    List<String> statesMap = (List<String>) document.get("states");
+                                    stateActions = new String[statesMap.size()];
+
+                                    Log.d("<<<<<<<<calc", "size: " + actionsSize + " players: " + playerSize + " spu: " + stepsPerUser + " Role:" + actionRoleMin +" - "+ actionRoleMax + "cond1: " + (documentCount > actionRoleMin) + "cond2: " + (documentCount < actionRoleMax));
+
+
+                                    int iterator = 0;
+
+
+                                    for (String state : statesMap) {
+
+                                        stateActions[iterator] = state;
+                                        iterator++;
+                                    }
+
+                                    BoatAction tempAction = new BoatAction(activityKey, target, current, document.getId(), stateActions);
+                                    activities.put(document.getId(), tempAction);
+
+
+
+                                }
+                                documentCount++;
                             }
 
+                        } else {
 
-
-
-
-
-
-
-
-                        BoatAction tempAction = new BoatAction(activityKey,target,current,document.getId(),stateActions);
-                        activities.put(document.getId(),tempAction);
-
+                        }
+                        boat = new Boat(activities, gameID);
+                        createActionButtons(activities);
+                        UpdateUI();
                     }
+                });
 
-                } else {
 
-                }
-                boat = new Boat(activities, gameID);
-                createActionButtons(activities);
-                UpdateUI();
-            }
-        });
 
 
 
@@ -144,7 +181,17 @@ public class MainGameActivity extends AppCompatActivity {
             }
         });
 
+
+                                                     }
+        });
+
     }
+
+
+
+
+
+
 
     private void UpdateUI(){
 
