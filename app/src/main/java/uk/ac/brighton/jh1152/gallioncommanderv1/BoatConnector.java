@@ -111,19 +111,20 @@ public class BoatConnector {
 
     private boolean isShowingActivityToPlayer(int activityPosition, int activitiesSize){
         boolean isShowingToPlayer = false;
-        int activitiesPerUser = activitiesSize / playerAmnt;
-        int activitiesMin = activitiesPerUser * playerPosition;
-        int activitesMax = activitiesMin + activitiesPerUser;
+        float activitiesPerUser = activitiesSize / (float)playerAmnt;
+        int activitiesMin = (int)Math.floor(activitiesPerUser * playerPosition);
+        int activitesMax = (int)Math.ceil(activitiesMin + activitiesPerUser);
 
 
         if(activityPosition <= activitesMax && activityPosition >= activitiesMin){
             isShowingToPlayer = true;
         }
         String message = " position:" + activityPosition +
+                " players: " + playerAmnt +
                 " Size: " + activitiesSize +
                 " max: " + activitesMax +
                 " min: " + activitiesMin;
-        Log.d("isShowingToPlayer" ,message);
+        Log.d("isShowingToPlayer " +isShowingToPlayer ,message);
         return isShowingToPlayer;
     }
 

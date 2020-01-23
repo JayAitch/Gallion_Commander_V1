@@ -77,7 +77,6 @@ public class LobbyActivity extends AppCompatActivity {
                 createNewBoatAndSetReference();
             }
         });
-        connnectToLobby();
     }
 
 
@@ -116,15 +115,13 @@ public class LobbyActivity extends AppCompatActivity {
 
                 int players = documentSnapshot.get("players", Integer.class);
                 lobbySizeText.setText(String.valueOf(players));
-
-
+                lobbyData = documentSnapshot.getData();
 
                 String boatID = documentSnapshot.get("boat", String.class);
 
                 if( boatID!= null && boatID.length() == 20){
-                    launchGame(boatID);
                     lobbyListener.remove();
-                    Log.d("snapshotcallback", "<<<<<<<<<");
+                    launchGame(boatID);
                 }
             }
         });
@@ -133,7 +130,6 @@ public class LobbyActivity extends AppCompatActivity {
 
 
     private void launchGame(String boatID){
-        Log.d("game>>>>>>> ", "game launched");
         Intent intent = new Intent(this, MainGameActivity.class);
         String boatIdMessage = boatID;
         intent.putExtra(EXTRA_BOAT_ID, boatIdMessage);
@@ -151,13 +147,13 @@ public class LobbyActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-     //   disconnectFromLobby();
+    //    disconnectFromLobby();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        //connnectToLobby();
+        connnectToLobby();
     }
 
     private BoatAction[] CreateBoatActionsCollection(){
@@ -190,6 +186,8 @@ public class LobbyActivity extends AppCompatActivity {
     String newBoatReferenceID;
     BoatAction[] boatActions = CreateBoatActionsCollection();
     int BoatActivtyCount= 0;
+
+
     private void createNewBoatAndSetReference(){
         Map<String, Object> newBoat = new HashMap<>();
         newBoat.put("lives", 10);
@@ -206,7 +204,7 @@ public class LobbyActivity extends AppCompatActivity {
                     db.collection("boats/"+ newBoatReferenceID +"/activities").add(action.getDocumentValues()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
-                            Log.d("<<<<<<<<<<<<<<<<<<<", "created new boat referece" + newBoatReferenceID);
+                            Log.d("<<<<<<<<<<<<<<<<<<<", "created new boat reference" + newBoatReferenceID);
                             BoatActivtyCount++;
                             CheckIfFinishedCreatingActions(BoatActivtyCount);
 
@@ -235,6 +233,8 @@ public class LobbyActivity extends AppCompatActivity {
 
 
     }
+
+
     private void CheckIfFinishedCreatingActions(int activitesCount){
         if(boatActions.length == activitesCount){
             lobbyData.put("boat", newBoatReferenceID);
