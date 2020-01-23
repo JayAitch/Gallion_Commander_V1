@@ -1,8 +1,5 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 
-import android.os.Debug;
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -20,6 +17,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 
 public class BoatConnector {
@@ -28,13 +27,16 @@ public class BoatConnector {
     CollectionReference activitiesCollection;
     DocumentReference boatDocument;
     public Boat currentBoat;
-    HashMap<String, String> boatInstructions;
+    private HashMap<String, String> boatInstructions;
     HashMap<String, BoatAction> boatActions;
+    public HashMap.Entry<String, String> currentInstruction;
+
 
     // temporary
     MainGameActivity activity;
     int playerPosition;
     int playerAmnt;
+    Random random;
 
     private final String BOAT_COLLECTION = "boats/";
     private final String  ACTIVITIES_COLLECTION = "/activities";
@@ -48,6 +50,7 @@ public class BoatConnector {
         db = FirebaseFirestore.getInstance();
         boatInstructions = new HashMap<>();
         boatActions = new HashMap<>();
+        random = new Random();
     }
 
 
@@ -74,20 +77,21 @@ public class BoatConnector {
 
                                     BoatAction tempAction = createActionFromDocumentData(document);
                                     boatActions.put(document.getId(), tempAction);
-
+                                    manageInstructionList(tempAction);
 
                                     if(isShowingActivityToPlayer(activityPosition, activitiesSize)){
                                         activity.addActionButton(tempAction);// temporary
                                     }
-
                                     activityPosition++;
+                                    loadAfterBoatInit(activitiesSize, activityPosition);
+
                                 }
                             }
                         }
                     });
 
                     currentBoat = new Boat(boatActions, documentID);
-                    activity.updateUI();
+
                 }
             }
         });
@@ -108,6 +112,12 @@ public class BoatConnector {
     }
 
 
+    private void loadAfterBoatInit(int size, int current){
+        if(current == size){
+            setRandomInstruction();
+            activity.updateUI();
+        }
+    }
 
     private boolean isShowingActivityToPlayer(int activityPosition, int activitiesSize){
         boolean isShowingToPlayer = false;
@@ -119,12 +129,6 @@ public class BoatConnector {
         if(activityPosition <= activitesMax && activityPosition >= activitiesMin){
             isShowingToPlayer = true;
         }
-        String message = " position:" + activityPosition +
-                " players: " + playerAmnt +
-                " Size: " + activitiesSize +
-                " max: " + activitesMax +
-                " min: " + activitiesMin;
-        Log.d("isShowingToPlayer " +isShowingToPlayer ,message);
         return isShowingToPlayer;
     }
 
@@ -140,19 +144,83 @@ public class BoatConnector {
     }
 
 
-
-    public void boatDocumentChangeCallback(){
-
-    }
-
-
     public void boatActivityChangeCallback(QueryDocumentSnapshot documentSnapshot){
         currentBoat.setActionValue(documentSnapshot.getId(), documentSnapshot.get("current", Integer.class));
+        manageInstructionList(currentBoat.actions.get(documentSnapshot.getId()));
         activity.updateUI();
-
-        Log.d("<<<<<<<<<<<<<<","documnet thinks: " + documentSnapshot.get("current", Integer.class) + " this class thinks::" + boatActions.get(documentSnapshot.getId()).actionCurrent + " boat thinks::" + currentBoat.actions.get(documentSnapshot.getId()).actionCurrent);
     }
 
 
 
+
+
+    private void manageInstructionList(BoatAction action) {
+
+        if(!areAllActivitiesComplete()) {
+
+            if (action.isActionComplete()) {
+                removeFromInstructions(action.documentReference);
+
+                if (currentInstruction.getKey() == action.documentReference) {
+                    setRandomInstruction();
+                    activity.displayCurrentInstruction();
+                }
+
+            } else {
+                addToInstructions(action);
+            }
+
+        }
+        else{
+            currentInstruction = null;
+            removeFromInstructions(action.documentReference);
+            activity.displayCompleteText();
+        }
+
+    }
+
+
+
+
+    private boolean areAllActivitiesComplete(){
+        boolean isComplete = true;
+        for(Map.Entry<String, BoatAction> actionEntry: boatActions.entrySet()){
+            BoatAction action = actionEntry.getValue();
+            if(!action.isActionComplete()){
+                isComplete = false;
+            }
+        }
+        return isComplete;
+    }
+
+
+    private void removeFromInstructions(String actionRef) {
+
+        if(boatInstructions.containsKey(actionRef)){
+            boatInstructions.remove(actionRef);
+        }
+    }
+
+
+    private void addToInstructions(BoatAction action){
+        boatInstructions.put(action.documentReference, action.getInstructionText());
+    }
+
+
+
+    private void setRandomInstruction(){
+
+        int instructionSize = boatInstructions.size();
+        if(instructionSize > 0){
+            int instructionsIncrementor = 0;
+            for(Map.Entry<String, String> instruction: boatInstructions.entrySet()){
+                currentInstruction = instruction;
+                int randomPosition = random.nextInt(instructionSize);
+                if(instructionsIncrementor == randomPosition){
+                    currentInstruction = instruction;
+                }
+                instructionsIncrementor++;
+            }
+        }
+    }
 }

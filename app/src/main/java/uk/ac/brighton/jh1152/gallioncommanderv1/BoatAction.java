@@ -31,6 +31,13 @@ public class BoatAction {
         return actionDBValues;
     }
 
+    public String getInstructionText(){
+        String instructionText;
+        String stateText;
+        stateText = states[actionTarget];
+        instructionText = stateText + " the " + actionName;
+        return instructionText;
+    }
 
     public boolean isActionComplete(){
         return (actionCurrent == actionTarget);

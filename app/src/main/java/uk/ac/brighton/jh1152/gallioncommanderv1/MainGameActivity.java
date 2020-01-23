@@ -2,6 +2,8 @@ package uk.ac.brighton.jh1152.gallioncommanderv1;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Debug;
+import android.util.Log;
 import android.widget.TextView;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +11,6 @@ import java.util.Map;
 
 
 public class MainGameActivity extends AppCompatActivity {
-    Boat boat;
     BoatConnector boatConnector;
     String gameID;// = "EiDo3HKycS8ckYxdMNGw";
     int playerNumber;
@@ -18,7 +19,7 @@ public class MainGameActivity extends AppCompatActivity {
 
 
     TextView instructionTextDisplay;
-    HashMap.Entry<String, String> currentInstruction;
+
 
 
     @Override
@@ -28,9 +29,8 @@ public class MainGameActivity extends AppCompatActivity {
         Intent intent = getIntent();
         gameID = intent.getStringExtra(LobbyActivity.EXTRA_BOAT_ID);
         playerNumber = intent.getIntExtra(LobbyActivity.EXTRA_PLAYER_NUMBER, -1);
-
-
         setContentView(R.layout.game_layout);
+        instructionTextDisplay = (TextView) findViewById(R.id.instruction_text);
         boatActionButtons = new HashMap<>();
         boatConnector = new BoatConnector(this, playerNumber);
         boatConnector.formBoatFromDocument(gameID);
@@ -41,9 +41,9 @@ public class MainGameActivity extends AppCompatActivity {
         IBaseBoatActionUI newUIAction;
         if(action.states.length > 2){
             // consider not adding states at all
-            newUIAction = new BoatActionSlider(this, boatConnector.currentBoat,0, action);
+            newUIAction = new BoatActionSlider(this, boatConnector.currentBoat, action);
         }else{
-            newUIAction = new BoatActionToggle(this, boatConnector.currentBoat, 0, action);
+            newUIAction = new BoatActionToggle(this, boatConnector.currentBoat,  action);
         }
 
         boatActionButtons.put(action.documentReference, newUIAction);
@@ -59,42 +59,30 @@ public class MainGameActivity extends AppCompatActivity {
             IBaseBoatActionUI UIAction = entry.getValue();
             UIAction.setTextValue();
         }
-/**
-        if (currentInstruction != null && !boat.isShipComplete()) {
 
-             if (!boat.isInstructionPossible(currentInstruction.getKey())) {
-                currentInstruction = boat.getNewInstruction();
-                Log.d("<<<<<<<<<<<<<<<", "instruction is" + currentInstruction.getValue());
-                displayCurrentInstruction();
-
-            }
-
-         } else {
-            currentInstruction = boat.getNewInstruction();
-            displayCurrentInstruction();
-        }
         displayCurrentInstruction();
- **/
     }
 
+    public void displayCurrentLives(){}
 
-    private void displayCurrentInstruction(){
-        if(boat.isShipComplete()){
-            instructionTextDisplay.setText("complete");
+    public void displayCurrentInstruction(){
+
+
+
+        if(boatConnector.currentInstruction != null){
+            instructionTextDisplay.setText(boatConnector.currentInstruction.getValue());
         }
         else{
-            if(currentInstruction != null) {
-                instructionTextDisplay.setText(currentInstruction.getValue());
-            }
-
-
-
+            Log.d("<<<<<<<<", "no currenty instr");
         }
 
-
+        Log.d("inside current instro", "dfsdfdfs");
     }
-
-
+    public void displayCompleteText(){
+        Log.d("inside displayvent", "dfsdfdfs");
+        String message = "complete";
+        instructionTextDisplay.setText(message);
+    }
 
 
 

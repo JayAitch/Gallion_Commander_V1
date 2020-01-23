@@ -14,11 +14,9 @@ public class BoatActionToggle implements IBaseBoatActionUI {
     BoatAction action;
     boolean isToggled;
     Button button;
-    int actionPos;
 
-    public BoatActionToggle(Activity activity, Boat boat,int position, BoatAction boatAction) {
+    public BoatActionToggle(Activity activity, Boat boat, BoatAction boatAction) {
         lBoat = boat;
-        actionPos = position;
         action = boatAction;
 
         button = (Button) new Button(activity);

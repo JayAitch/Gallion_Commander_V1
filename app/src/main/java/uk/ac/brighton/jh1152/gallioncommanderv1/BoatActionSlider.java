@@ -11,11 +11,11 @@ public class BoatActionSlider implements IBaseBoatActionUI {
     Boat lBoat;
     BoatAction action;
     SeekBar slider;
-    int actionPos;
 
-    public BoatActionSlider(Activity activity, Boat boat, final int position, BoatAction boatAction) {
+
+    public BoatActionSlider(Activity activity, Boat boat, BoatAction boatAction) {
         lBoat = boat;
-        actionPos = position;
+
         action = boatAction;
 
 
