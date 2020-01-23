@@ -24,7 +24,7 @@ public class BoatActionToggle implements IBaseBoatActionUI {
         button = (Button) new Button(activity);
         TableLayout layout = (TableLayout) activity.findViewById(R.id.tableLayout);
         layout.addView(button);
-        //setTextValue();
+        setTextValue();
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -16,12 +16,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -44,6 +46,7 @@ public class LobbyActivity extends AppCompatActivity {
     ImageView lobbyQRCode;
     Button startGameBtn;
     DocumentReference lobbyDocument;
+    ListenerRegistration lobbyListener;
     Map<String, Object> lobbyData;
     WriteBatch activitiesBatch;
     int thisPlayerNumber;
@@ -74,6 +77,7 @@ public class LobbyActivity extends AppCompatActivity {
                 createNewBoatAndSetReference();
             }
         });
+        connnectToLobby();
     }
 
 
@@ -106,10 +110,11 @@ public class LobbyActivity extends AppCompatActivity {
                     }
                 });
 
-        lobbyDocument.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        lobbyListener = lobbyDocument.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                int players =(int)(long)documentSnapshot.get("players");
+
+                int players = documentSnapshot.get("players", Integer.class);
                 lobbySizeText.setText(String.valueOf(players));
 
 
@@ -118,6 +123,8 @@ public class LobbyActivity extends AppCompatActivity {
 
                 if( boatID!= null && boatID.length() == 20){
                     launchGame(boatID);
+                    lobbyListener.remove();
+                    Log.d("snapshotcallback", "<<<<<<<<<");
                 }
             }
         });
@@ -150,7 +157,7 @@ public class LobbyActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        connnectToLobby();
+        //connnectToLobby();
     }
 
     private BoatAction[] CreateBoatActionsCollection(){

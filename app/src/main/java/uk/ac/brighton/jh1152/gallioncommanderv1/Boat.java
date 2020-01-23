@@ -21,7 +21,7 @@ import java.util.Random;
 public class Boat {
 
 
-    private HashMap<String, BoatAction> actions;
+    public HashMap<String, BoatAction> actions;
     private HashMap<String, String> possibleInstructions;
     private String docRef;
     private FirebaseFirestore database;
