@@ -10,18 +10,24 @@ public class Boat {
 
 
     public HashMap<String, BoatAction> actions;
-    private HashMap<String, String> possibleInstructions;
-    private String docRef;
-    private FirebaseFirestore database;
-    private CollectionReference actionsCollection;
-    FirebaseFirestore db; // probably not here
+    private String docRef; //temp
+    public int livesRemaining;
 
-    public Boat(HashMap<String,BoatAction> actions , String documentReference){
+    private FirebaseFirestore db; // probably not here
+
+    public Boat(HashMap<String,BoatAction> actions , String documentReference, int livesRemaining){
+        this.livesRemaining = livesRemaining;
         docRef = documentReference;
         this.actions = actions;
         db = FirebaseFirestore.getInstance();
     }
 
+    public void setLocalValue(String key, int value){
+        BoatAction changingAction = actions.get(key);
+        if(changingAction != null){
+            changingAction.actionCurrent = value;
+        }
+    }
 
     public boolean setActionValue(String key, int value){
         BoatAction changingAction = actions.get(key);
@@ -34,6 +40,7 @@ public class Boat {
         }
         return false;
     }
+
 
 
 

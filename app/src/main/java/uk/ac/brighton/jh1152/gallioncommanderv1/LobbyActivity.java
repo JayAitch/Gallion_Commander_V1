@@ -147,7 +147,7 @@ public class LobbyActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-    //    disconnectFromLobby();
+        disconnectFromLobby();
     }
 
     @Override
@@ -157,7 +157,7 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
     private BoatAction[] CreateBoatActionsCollection(){
-        BoatAction[] newBoatActins = new BoatAction[4];
+        BoatAction[] newBoatActins = new BoatAction[8];
         String[] tempStates = {"release","capture"};
         newBoatActins[0] = new BoatAction("Kraken", 0, 1, "0", Arrays.copyOf(tempStates, tempStates.length));
 
@@ -173,6 +173,24 @@ public class LobbyActivity extends AppCompatActivity {
 
         String[] tempStates4 = {"down","up"};
         newBoatActins[3] = new BoatAction("Rudder", 0, 1, "3", Arrays.copyOf(tempStates4, tempStates4.length));
+
+
+
+        String[] tempStates5 = {"cut","fix"};
+        newBoatActins[4] = new BoatAction("Sails", 0, 1, "3", Arrays.copyOf(tempStates5, tempStates5.length));
+
+
+        String[] tempStates6 = {"stow","get out"};
+        newBoatActins[5] = new BoatAction("Rum", 0, 1, "3", Arrays.copyOf(tempStates6, tempStates6.length));
+
+
+        String[] tempStates7 = {"cage", "uncage"};
+        newBoatActins[6] = new BoatAction("Parrot", 0, 1, "3", Arrays.copyOf(tempStates7, tempStates7.length));
+
+
+        String[] tempStates8 = {"start", "stop"};
+        newBoatActins[7] = new BoatAction("ERRing", 0, 1, "3", Arrays.copyOf(tempStates8, tempStates8.length));
+
         return newBoatActins;
     }
 

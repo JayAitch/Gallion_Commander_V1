@@ -2,7 +2,6 @@ package uk.ac.brighton.jh1152.gallioncommanderv1;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Debug;
 import android.util.Log;
 import android.widget.TextView;
 import java.util.HashMap;
@@ -19,7 +18,8 @@ public class MainGameActivity extends AppCompatActivity {
 
 
     TextView instructionTextDisplay;
-
+    TextView livesLeftText;
+    TextView actionsRemainingText;
 
 
     @Override
@@ -31,6 +31,10 @@ public class MainGameActivity extends AppCompatActivity {
         playerNumber = intent.getIntExtra(LobbyActivity.EXTRA_PLAYER_NUMBER, -1);
         setContentView(R.layout.game_layout);
         instructionTextDisplay = (TextView) findViewById(R.id.instruction_text);
+        livesLeftText = findViewById(R.id.lives_remaining_text);
+        actionsRemainingText = findViewById(R.id.instructions_size_text);
+
+
         boatActionButtons = new HashMap<>();
         boatConnector = new BoatConnector(this, playerNumber);
         boatConnector.formBoatFromDocument(gameID);
@@ -52,7 +56,7 @@ public class MainGameActivity extends AppCompatActivity {
 
 
 
-
+    // change this to a push update on a UI object
     public void updateUI(){
 
         for (Map.Entry<String, IBaseBoatActionUI> entry: boatActionButtons.entrySet()) {
@@ -61,25 +65,31 @@ public class MainGameActivity extends AppCompatActivity {
         }
 
         displayCurrentInstruction();
+        displayActionsLeft();
+        displayLivesLeft();
     }
 
-    public void displayCurrentLives(){}
+    public void displayActionsLeft(){
+        actionsRemainingText.setText( Integer.toString(boatConnector.getActionsRemainingAmount()));
+    }
+    public void displayLivesLeft(){
+        livesLeftText.setText(Integer.toString(boatConnector.currentBoat.livesRemaining));
+    }
 
     public void displayCurrentInstruction(){
-
-
 
         if(boatConnector.currentInstruction != null){
             instructionTextDisplay.setText(boatConnector.currentInstruction.getValue());
         }
         else{
-            Log.d("<<<<<<<<", "no currenty instr");
+
         }
 
-        Log.d("inside current instro", "dfsdfdfs");
     }
+
+
+
     public void displayCompleteText(){
-        Log.d("inside displayvent", "dfsdfdfs");
         String message = "complete";
         instructionTextDisplay.setText(message);
     }

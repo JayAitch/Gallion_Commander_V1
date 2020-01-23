@@ -1,5 +1,8 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 
+import android.os.Debug;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -65,6 +68,8 @@ public class BoatConnector {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     playerAmnt = task.getResult().get("players", Integer.class); //temp
+                    int lives = task.getResult().get("lives", Integer.class); //temp
+
                     activitiesCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -90,7 +95,7 @@ public class BoatConnector {
                         }
                     });
 
-                    currentBoat = new Boat(boatActions, documentID);
+                    currentBoat = new Boat(boatActions, documentID, lives);
 
                 }
             }
@@ -111,6 +116,9 @@ public class BoatConnector {
 
     }
 
+    public int getActionsRemainingAmount(){
+        return boatInstructions.entrySet().size();
+    }
 
     private void loadAfterBoatInit(int size, int current){
         if(current == size){
@@ -145,9 +153,10 @@ public class BoatConnector {
 
 
     public void boatActivityChangeCallback(QueryDocumentSnapshot documentSnapshot){
-        currentBoat.setActionValue(documentSnapshot.getId(), documentSnapshot.get("current", Integer.class));
+        currentBoat.setLocalValue(documentSnapshot.getId(), documentSnapshot.get("current", Integer.class));
         manageInstructionList(currentBoat.actions.get(documentSnapshot.getId()));
         activity.updateUI();
+        Log.d("triggering callback---", "update");
     }
 
 
@@ -156,27 +165,38 @@ public class BoatConnector {
 
     private void manageInstructionList(BoatAction action) {
 
-        if(!areAllActivitiesComplete()) {
+//        if(!areAllActivitiesComplete()) {
 
-            if (action.isActionComplete()) {
-                removeFromInstructions(action.documentReference);
+                if (action.isActionComplete()) {
+                    removeFromInstructions(action.documentReference);
+                    if(areAllActivitiesComplete())
+                    {
+                        activity.displayCompleteText();
+                        currentInstruction = null;
+                    }
+                    else
+                    {
+                        if (currentInstruction == null ||currentInstruction.getKey() == action.documentReference) {
+                            setRandomInstruction();
+                        }
+                    }
 
-                if (currentInstruction.getKey() == action.documentReference) {
-                    setRandomInstruction();
-                    activity.displayCurrentInstruction();
+                } else {
+                    addToInstructions(action);
+                    if (currentInstruction == null ||currentInstruction.getKey() == action.documentReference){
+                        setRandomInstruction();
+                    }
+
                 }
 
-            } else {
-                addToInstructions(action);
-            }
 
-        }
-        else{
-            currentInstruction = null;
-            removeFromInstructions(action.documentReference);
-            activity.displayCompleteText();
-        }
 
+
+//        } else {
+//            currentInstruction = null;
+//            removeFromInstructions(action.documentReference);
+//            activity.displayCompleteText();
+//        }
     }
 
 
@@ -210,7 +230,7 @@ public class BoatConnector {
 
     private void setRandomInstruction(){
 
-        int instructionSize = boatInstructions.size();
+        int instructionSize = boatInstructions.entrySet().size();
         if(instructionSize > 0){
             int instructionsIncrementor = 0;
             for(Map.Entry<String, String> instruction: boatInstructions.entrySet()){
