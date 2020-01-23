@@ -66,21 +66,6 @@ public class Boat {
     }
 
 
-    // method is being called too many timesd
-//    private void setPossibleInstructions(){
-//
-//        for (Map.Entry<String, BoatAction> entry: actions.entrySet()) {
-//                BoatAction boatAction = entry.getValue();
-//                if(boatAction.isActionComplete()){
-//                    possibleInstructions.remove(entry.getKey());
-//                }
-//                else{
-//                    String instructionText = boatAction.states[boatAction.actionTarget] +" the "+ boatAction.actionName  ;
-//                    Log.d("<<<<<<<<<<<<<", "instructionText:  "  + instructionText);
-//                    possibleInstructions.put(entry.getKey(), instructionText);
-//                }
-//        }
-//    }
     private void setPossibleInstructions(){
         CollectionReference actionscollection = db.collection("boats/"+ docRef +"/activities");
         // concider moving this to snapshot added method
