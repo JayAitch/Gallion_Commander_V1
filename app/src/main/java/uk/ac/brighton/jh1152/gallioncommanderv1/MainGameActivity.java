@@ -78,8 +78,10 @@ public class MainGameActivity extends AppCompatActivity {
 
     public void displayCurrentInstruction(){
 
-        if(boatConnector.currentInstruction != null){
-            instructionTextDisplay.setText(boatConnector.currentInstruction.getValue());
+        String currentInstructionString = boatConnector.getCurrentInstructionString();
+
+        if(currentInstructionString.length() > 0){
+            instructionTextDisplay.setText(currentInstructionString);
         }
         else{
 

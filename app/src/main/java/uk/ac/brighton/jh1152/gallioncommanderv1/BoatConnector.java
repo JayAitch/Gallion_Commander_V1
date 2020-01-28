@@ -1,5 +1,6 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 
+import android.os.CountDownTimer;
 import android.os.Debug;
 import android.util.Log;
 
@@ -32,7 +33,7 @@ public class BoatConnector {
     public Boat currentBoat;
     private HashMap<String, String> boatInstructions;
     HashMap<String, BoatAction> boatActions;
-    public HashMap.Entry<String, String> currentInstruction;
+    private HashMap.Entry<String, String> currentInstruction;
 
 
     // temporary
@@ -122,6 +123,7 @@ public class BoatConnector {
 
     private void loadAfterBoatInit(int size, int current){
         if(current == size){
+
             setRandomInstruction();
             activity.updateUI();
         }
@@ -229,18 +231,54 @@ public class BoatConnector {
 
 
     private void setRandomInstruction(){
-
         int instructionSize = boatInstructions.entrySet().size();
         if(instructionSize > 0){
             int instructionsIncrementor = 0;
+            int randomPosition = random.nextInt(instructionSize);
             for(Map.Entry<String, String> instruction: boatInstructions.entrySet()){
-                currentInstruction = instruction;
-                int randomPosition = random.nextInt(instructionSize);
+
                 if(instructionsIncrementor == randomPosition){
                     currentInstruction = instruction;
                 }
                 instructionsIncrementor++;
             }
+
+
+            createInstructionCountdown();
         }
+    }
+
+
+    public void instructionTimeOut(){
+
+    }
+
+
+    // move this to another class
+    CountDownTimer timer;
+
+    private void createInstructionCountdown(){
+
+        if(timer == null) {
+            timer = new CountDownTimer(10000, 100) {
+
+                @Override
+                public void onTick(long millisUntilFinished) {
+
+                }
+
+                @Override
+                public void onFinish() {
+                    setRandomInstruction();
+                    activity.updateUI();
+                }
+            };
+        }
+        timer.start();
+    }
+
+    public String getCurrentInstructionString(){
+        if(currentInstruction == null) return "";
+        return currentInstruction.getValue();
     }
 }
