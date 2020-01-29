@@ -46,6 +46,7 @@ public class InstructionManager {
     }
 
 
+
     public void setRandomInstruction(){
         int instructionSize = boatInstructions.entrySet().size();
         if(instructionSize > 0){

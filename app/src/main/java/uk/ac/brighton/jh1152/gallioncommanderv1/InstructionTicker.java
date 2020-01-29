@@ -43,6 +43,7 @@ public class InstructionTicker {
     }
 
 
+
     public class BarTimer extends CountDownTimer{
 
         long milisDuration;
