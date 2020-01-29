@@ -28,7 +28,10 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:progressTint="#00EE0606" />
+            android:background="#00000000"
+            android:indeterminate="false"
+            android:progress="95"
+            android:progressTint="#F80202" />
     </LinearLayout>
 
     <TableLayout

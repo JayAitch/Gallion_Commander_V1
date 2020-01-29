@@ -3,6 +3,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +54,12 @@ public class MainGameActivity extends AppCompatActivity {
         boatActionButtons.put(action.documentReference, newUIAction);
     }
 
+    public void removeAllActionButtons(){
+        boatActionButtons.clear();
+        TableLayout layout = (TableLayout) findViewById(R.id.tableLayout);
+        layout.removeAllViews();
 
+    }
 
 
     // change this to a push update on a UI object
@@ -64,7 +70,6 @@ public class MainGameActivity extends AppCompatActivity {
             UIAction.setTextValue();
         }
 
-        displayCurrentInstruction();
         displayActionsLeft();
         displayLivesLeft();
     }
@@ -72,28 +77,9 @@ public class MainGameActivity extends AppCompatActivity {
     public void displayActionsLeft(){
         actionsRemainingText.setText( Integer.toString(boatConnector.getActionsRemainingAmount()));
     }
+
     public void displayLivesLeft(){
         livesLeftText.setText(Integer.toString(boatConnector.currentBoat.livesRemaining));
-    }
-
-    public void displayCurrentInstruction(){
-
-        String currentInstructionString = boatConnector.getCurrentInstructionString();
-
-        if(currentInstructionString.length() > 0){
-            instructionTextDisplay.setText(currentInstructionString);
-        }
-        else{
-
-        }
-
-    }
-
-
-
-    public void displayCompleteText(){
-        String message = "complete";
-        instructionTextDisplay.setText(message);
     }
 
 

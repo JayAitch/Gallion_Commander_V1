@@ -1,6 +1,8 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 
 import android.os.CountDownTimer;
+import android.os.Debug;
+import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -22,11 +24,24 @@ public class InstructionTicker {
 
     private void createTimer(long duration){
         barTimer = new BarTimer(duration);
+        startTimer();
     }
 
-    private void startTimer(){
+    public void startTimer(){
         barTimer.start();
     }
+    public void stopTimer(){barTimer.cancel();}
+
+    private void barFinish(){
+        boatConnector.instructionTimeOut();
+    }
+
+
+    public void displayInstructionText(){
+        String text = boatConnector.getCurrentInstructionString();
+        instructionText.setText(text);
+    }
+
 
     public class BarTimer extends CountDownTimer{
 
@@ -45,7 +60,9 @@ public class InstructionTicker {
 
         @Override
         public void onFinish() {
-            boatConnector.instructionTimeOut();
+
+            Log.d("ba finished", "<<<<<<<<<<<<<<<<<<<");
+            barFinish();
         }
     }
 }

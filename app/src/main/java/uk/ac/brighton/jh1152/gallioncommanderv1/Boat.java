@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class Boat {
@@ -41,8 +42,13 @@ public class Boat {
         return false;
     }
 
+    public boolean isBoatAlive(){
+        return (livesRemaining > 0);
+    }
 
-
+    public void removeALife(){
+        livesRemaining--;
+    }
 
     void setDocumentValue(BoatAction action){
         db.collection("boats/" + docRef +"/activities")
@@ -52,5 +58,12 @@ public class Boat {
                     public void onSuccess(Void aVoid) {
                     }
                 });
+    }
+
+
+    public Map<String, Object> getData(){
+        HashMap<String, Object> boatData  = new HashMap<>();
+        boatData.put("lives", livesRemaining);
+        return boatData;
     }
 }

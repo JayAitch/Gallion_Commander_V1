@@ -3,6 +3,8 @@ package uk.ac.brighton.jh1152.gallioncommanderv1;
 import android.os.CountDownTimer;
 import android.os.Debug;
 import android.util.Log;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,11 +16,13 @@ import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,16 +35,18 @@ public class BoatConnector {
     CollectionReference activitiesCollection;
     DocumentReference boatDocument;
     public Boat currentBoat;
-    private HashMap<String, String> boatInstructions;
     HashMap<String, BoatAction> boatActions;
-    private HashMap.Entry<String, String> currentInstruction;
 
+    private static Long INSTRUCTION_TIME = (long) 10000;
+    private InstructionTicker instructionTicker;
+    private InstructionManager instructionManager;
 
     // temporary
     MainGameActivity activity;
     int playerPosition;
     int playerAmnt;
     Random random;
+    String documentReference;
 
     private final String BOAT_COLLECTION = "boats/";
     private final String  ACTIVITIES_COLLECTION = "/activities";
@@ -48,13 +54,11 @@ public class BoatConnector {
     public BoatConnector (MainGameActivity activity, int playerPosition){
         this.activity = activity; //temprory
         this.playerPosition = playerPosition; //temp
-
-
-
         db = FirebaseFirestore.getInstance();
-        boatInstructions = new HashMap<>();
+        instructionManager = new InstructionManager();
         boatActions = new HashMap<>();
         random = new Random();
+
     }
 
 
@@ -103,6 +107,8 @@ public class BoatConnector {
         });
 
 
+
+        // setup something to remove/ add these on pause/play
         activitiesCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -115,19 +121,37 @@ public class BoatConnector {
             }
         });
 
+        boatDocument.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+
+            }
+        });
+
     }
 
     public int getActionsRemainingAmount(){
-        return boatInstructions.entrySet().size();
+        return instructionManager.getInstructionsSize();
     }
 
     private void loadAfterBoatInit(int size, int current){
         if(current == size){
-
-            setRandomInstruction();
+            instructionManager.setRandomInstruction();
+            initInstructionTicker();
             activity.updateUI();
         }
     }
+
+
+    // probably not here
+    private void initInstructionTicker(){
+        ProgressBar progressBar = activity.findViewById(R.id.instruction_progress_bar);
+        TextView instructionText = activity.findViewById(R.id.instruction_text);
+        instructionTicker = new InstructionTicker(this, progressBar, instructionText, INSTRUCTION_TIME);
+        instructionTicker.displayInstructionText();
+    }
+
+
 
     private boolean isShowingActivityToPlayer(int activityPosition, int activitiesSize){
         boolean isShowingToPlayer = false;
@@ -158,51 +182,81 @@ public class BoatConnector {
         currentBoat.setLocalValue(documentSnapshot.getId(), documentSnapshot.get("current", Integer.class));
         manageInstructionList(currentBoat.actions.get(documentSnapshot.getId()));
         activity.updateUI();
-        Log.d("triggering callback---", "update");
+       if(areAllActivitiesComplete()){
+            stopGame();
+            testNewLevel();
+        }
+    }
+
+
+    //change this jank into states, might want a class to update the UI centrally
+    // therer are 2 forms of upodates depending on the document change
+    private void currentInstructionComplete(){
+        instructionTicker.stopTimer();
+        instructionTicker.displayInstructionText();
+        instructionTicker.startTimer();
+    }
+
+
+    private void removeALife() {
+            Map<String, Object> boatData = currentBoat.getData();
+            boatData.put("lives", FieldValue.increment(-1));
+            activity.updateUI();
+            currentBoat.removeALife();
+            boatDocument.update(boatData);
     }
 
 
 
 
+    public void instructionTimeOut(){
+        removeALife();
+        if (currentBoat.isBoatAlive()) {
+            instructionManager.setRandomInstruction();
+            instructionTicker.displayInstructionText();
+            instructionTicker.startTimer();
+            if(areAllActivitiesComplete()){
+                stopGame();
+                //testNewLevel();
+            }
+        }
+        else{
+            instructionTicker.displayInstructionText();
+        }
+    }
+
+
+    private void stopGame(){
+        instructionTicker.stopTimer();
+    }
 
     private void manageInstructionList(BoatAction action) {
 
-//        if(!areAllActivitiesComplete()) {
+        instructionManager.manageInstructionList(action);
+        if(instructionManager.isCurrentInstruction(action.documentReference)){
+            instructionManager.setRandomInstruction();
+            currentInstructionComplete();
+        }
 
-                if (action.isActionComplete()) {
-                    removeFromInstructions(action.documentReference);
-                    if(areAllActivitiesComplete())
-                    {
-                        activity.displayCompleteText();
-                        currentInstruction = null;
-                    }
-                    else
-                    {
-                        if (currentInstruction == null ||currentInstruction.getKey() == action.documentReference) {
-                            setRandomInstruction();
-                        }
-                    }
-
-                } else {
-                    addToInstructions(action);
-                    if (currentInstruction == null ||currentInstruction.getKey() == action.documentReference){
-                        setRandomInstruction();
-                    }
-
-                }
-
-
-
-
-//        } else {
-//            currentInstruction = null;
-//            removeFromInstructions(action.documentReference);
-//            activity.displayCompleteText();
-//        }
     }
 
 
+    public String getCurrentInstructionString(){
+        Log.d("getting instruction", "" + currentBoat.livesRemaining);
+        if(!currentBoat.isBoatAlive()) {
+            return "Game Over!";
+        }
+        else if(areAllActivitiesComplete()){
+            return "Complete!";
+        }
+        else if(!instructionManager.hasAnInstruction()){
+            return "";
+        }
+        else{
+            return instructionManager.getCurrentInstructionString();
+        }
 
+    }
 
     private boolean areAllActivitiesComplete(){
         boolean isComplete = true;
@@ -216,69 +270,18 @@ public class BoatConnector {
     }
 
 
-    private void removeFromInstructions(String actionRef) {
 
-        if(boatInstructions.containsKey(actionRef)){
-            boatInstructions.remove(actionRef);
-        }
-    }
-
-
-    private void addToInstructions(BoatAction action){
-        boatInstructions.put(action.documentReference, action.getInstructionText());
-    }
-
-
-
-    private void setRandomInstruction(){
-        int instructionSize = boatInstructions.entrySet().size();
-        if(instructionSize > 0){
-            int instructionsIncrementor = 0;
-            int randomPosition = random.nextInt(instructionSize);
-            for(Map.Entry<String, String> instruction: boatInstructions.entrySet()){
-
-                if(instructionsIncrementor == randomPosition){
-                    currentInstruction = instruction;
-                }
-                instructionsIncrementor++;
-            }
-
-
-            createInstructionCountdown();
-        }
-    }
-
-
-    public void instructionTimeOut(){
+    private void testNewLevel(){
+//        activity.removeAllActionButtons();
+//        String[] tempStates4 = {"somehthing","somthing else"};
+//        BoatAction newBoatAction = new BoatAction("Level2 thing", 0, 1, "3", Arrays.copyOf(tempStates4, tempStates4.length));
+//        activitiesCollection.add(newBoatAction.getDocumentValues());
+//        formBoatFromDocument(boatDocument.getId());
 
     }
 
 
-    // move this to another class
-    CountDownTimer timer;
 
-    private void createInstructionCountdown(){
 
-        if(timer == null) {
-            timer = new CountDownTimer(10000, 100) {
 
-                @Override
-                public void onTick(long millisUntilFinished) {
-
-                }
-
-                @Override
-                public void onFinish() {
-                    setRandomInstruction();
-                    activity.updateUI();
-                }
-            };
-        }
-        timer.start();
-    }
-
-    public String getCurrentInstructionString(){
-        if(currentInstruction == null) return "";
-        return currentInstruction.getValue();
-    }
 }
