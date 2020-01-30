@@ -56,6 +56,7 @@ public class MainGameActivity extends AppCompatActivity {
 
     public void removeAllActionButtons(){
         boatActionButtons.clear();
+        Log.d("removing actions buttons <<<<, ", "" + boatActionButtons.size());
         TableLayout layout = (TableLayout) findViewById(R.id.tableLayout);
         layout.removeAllViews();
 

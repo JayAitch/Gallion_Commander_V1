@@ -18,7 +18,6 @@ public class InstructionTicker {
         this.progressBar = progressBar;
         this.boatConnector = boatConnector;
         this.instructionText = instructionText;
-        instructionString = boatConnector.getCurrentInstructionString();
         createTimer(duration);
     }
 

@@ -48,7 +48,7 @@ public class LobbyActivity extends AppCompatActivity {
     DocumentReference lobbyDocument;
     ListenerRegistration lobbyListener;
     Map<String, Object> lobbyData;
-
+    ActionCreator actionCreator;
     int thisPlayerNumber;
     public static final String EXTRA_BOAT_ID = "uk.ac.brighton.jh1152.gallioncommanderv1.BOATID";
     public static final String EXTRA_PLAYER_NUMBER = "uk.ac.brighton.jh1152.gallioncommanderv1.PLAYERNUMBER";
@@ -69,7 +69,7 @@ public class LobbyActivity extends AppCompatActivity {
         startGameBtn = (Button) findViewById(R.id.start_game_button);
         db = FirebaseFirestore.getInstance();
         lobbyDocument = db.collection("games").document(lobbyID);
-
+        actionCreator = new ActionCreator();
 
         startGameBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,53 +156,15 @@ public class LobbyActivity extends AppCompatActivity {
         connnectToLobby();
     }
 
-    private BoatAction[] CreateBoatActionsCollection(){
-        BoatAction[] newBoatActins = new BoatAction[8];
-        String[] tempStates = {"release","capture"};
-        newBoatActins[0] = new BoatAction("Kraken", 0, 1, "0", Arrays.copyOf(tempStates, tempStates.length));
-
-
-
-        String[] tempStates2 = {"unload","load"};
-        newBoatActins[1] = new BoatAction("Cannons", 0, 1, "1", Arrays.copyOf(tempStates2, tempStates2.length));
-
-
-        String[] tempStates3 = {"raise","lower"};
-        newBoatActins[2] = new BoatAction("Jolly Rodger", 0, 1, "2", Arrays.copyOf(tempStates3, tempStates3.length));
-
-
-        String[] tempStates4 = {"down","up"};
-        newBoatActins[3] = new BoatAction("Rudder", 0, 1, "3", Arrays.copyOf(tempStates4, tempStates4.length));
-
-
-
-        String[] tempStates5 = {"cut","fix"};
-        newBoatActins[4] = new BoatAction("Sails", 0, 1, "3", Arrays.copyOf(tempStates5, tempStates5.length));
-
-
-        String[] tempStates6 = {"stow","get out"};
-        newBoatActins[5] = new BoatAction("Rum", 0, 1, "3", Arrays.copyOf(tempStates6, tempStates6.length));
-
-
-        String[] tempStates7 = {"cage", "uncage"};
-        newBoatActins[6] = new BoatAction("Parrot", 0, 1, "3", Arrays.copyOf(tempStates7, tempStates7.length));
-
-
-        String[] tempStates8 = {"start", "stop"};
-        newBoatActins[7] = new BoatAction("ERRing", 0, 1, "3", Arrays.copyOf(tempStates8, tempStates8.length));
-
-        return newBoatActins;
+    private BoatAction[] createBoatActionsCollection(){
+        return  actionCreator.getRandomActions(2,2);
     }
 
 
 
 
-
-
-
-
     String newBoatReferenceID;
-    BoatAction[] boatActions = CreateBoatActionsCollection();
+    BoatAction[] boatActions;
     int BoatActivtyCount= 0;
 
 
@@ -210,7 +172,7 @@ public class LobbyActivity extends AppCompatActivity {
         Map<String, Object> newBoat = new HashMap<>();
         newBoat.put("lives", GameSettings.BASE_BOAT_LIVES);
         newBoat.put("players", lobbyData.get("players"));
-
+        boatActions = createBoatActionsCollection();
 
         db.collection("boats").add(newBoat).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
@@ -219,7 +181,7 @@ public class LobbyActivity extends AppCompatActivity {
 
                 for(BoatAction action: boatActions){
 
-                    db.collection("boats/"+ newBoatReferenceID +"/activities").document(action.actionName).set(action.getDocumentValues()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    db.collection("boats/"+ newBoatReferenceID +"/activities").document(action.documentReference).set(action.getDocumentValues()).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             BoatActivtyCount++;

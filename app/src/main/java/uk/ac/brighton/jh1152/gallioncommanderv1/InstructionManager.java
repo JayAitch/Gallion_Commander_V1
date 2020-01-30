@@ -19,6 +19,7 @@ public class InstructionManager {
 
     public void manageInstructionList(BoatAction action) {
 
+        if(action == null) return;
         if (action.isActionComplete()) {
             removeFromInstructions(action.documentReference);
 
@@ -44,7 +45,9 @@ public class InstructionManager {
     private void addToInstructions(BoatAction action){
         boatInstructions.put(action.documentReference, action.getInstructionText());
     }
-
+    public void clearInstructions(){
+        boatInstructions.clear();
+    }
 
 
     public void setRandomInstruction(){
@@ -74,6 +77,8 @@ public class InstructionManager {
     public boolean hasAnInstruction(){
         return (currentInstruction != null);
     }
+
+
     public boolean isCurrentInstruction(String instructionKey){
         if(currentInstruction == null) return false;
         return (instructionKey == currentInstruction.getKey());

@@ -43,7 +43,7 @@ public class BoatActionToggle implements IBaseBoatActionUI {
     @Override
     public Boolean SetBoatAction() {
         isToggled = !isToggled;
-        Log.d("<<<<<<<<<<<<<", "toggle spamming<<<<<<<<<<<<");
+        Log.d("toggling", ""+ action.documentReference);
        // lBoat.setActionValue(actionPos, action.actionCurrent);
         lBoat.setActionValue(action.documentReference, isToggled ? 1: 0);
         //setTextValue();

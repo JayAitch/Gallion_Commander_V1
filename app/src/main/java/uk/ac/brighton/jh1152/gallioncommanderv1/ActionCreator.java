@@ -1,10 +1,123 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 
+import android.os.Debug;
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
+
 public class ActionCreator {
 
+    private enum actionTypes {TOGGLE, SLIDER}
+    private PossibleAction[]possibleActions;
+    private Random random;
 
 
-    public Boat createAction(){
+    private class PossibleAction{
+        public String name;
+        public String[] states;
+        public actionTypes actionType;
+        public PossibleAction(String name, String[] states, actionTypes actionType){
+            this.name = name;
+            this.states = states;
+            this.actionType = actionType;
+        }
+    }
+
+
+    public ActionCreator(){
+        random = new Random();
+        possibleActions = new PossibleAction[8];
+        String[] tempStates = {"release","capture"};
+        possibleActions[0] = new PossibleAction("Kraken", Arrays.copyOf(tempStates, tempStates.length), actionTypes.TOGGLE);
+
+        String[] tempStates2 = {"unload","load"};
+        possibleActions[1] = new PossibleAction("Cannons",  Arrays.copyOf(tempStates2, tempStates2.length), actionTypes.TOGGLE);
+
+        String[] tempStates3 = {"raise","lower"};
+        possibleActions[2] = new PossibleAction("Jolly Rodger",  Arrays.copyOf(tempStates3, tempStates3.length), actionTypes.TOGGLE);
+
+        String[] tempStates4 = {"down","up"};
+        possibleActions[3] = new PossibleAction("Rudder",  Arrays.copyOf(tempStates4, tempStates4.length), actionTypes.TOGGLE);
+
+        String[] tempStates5 = {"cut","fix"};
+        possibleActions[4] =new PossibleAction("Sails",  Arrays.copyOf(tempStates5, tempStates5.length), actionTypes.TOGGLE);
+
+        String[] tempStates6 = {"stow","get out"};
+        possibleActions[5] =new PossibleAction("Rum", Arrays.copyOf(tempStates6, tempStates6.length), actionTypes.TOGGLE);
+
+        String[] tempStates7 = {"cage", "uncage"};
+        possibleActions[6] =new PossibleAction("Parrot", Arrays.copyOf(tempStates7, tempStates7.length), actionTypes.TOGGLE);
+
+        String[] tempStates8 = {"start", "stop"};
+        possibleActions[7] =new PossibleAction("ERRing",Arrays.copyOf(tempStates8, tempStates8.length), actionTypes.TOGGLE);
 
     }
+
+    public BoatAction[] getRandomActions(int finishedAmnt, int notFinishedAmnt){
+        ArrayList<BoatAction> chosenBoatActions = new ArrayList<>();
+        int iOverallPosition = 0;
+        int position = 0;
+
+
+        for(int ifinishedAmnt = 0; ifinishedAmnt < finishedAmnt; ifinishedAmnt++){
+            Log.d("made some actions", "position not finished" + position);
+            position = roleAPosition();
+            if(position != -1){
+                chosenBoatActions.add(createRandomFinishedAction(position));
+                iOverallPosition++;
+            }
+
+        }
+
+        for(int iNotFinishedAmnt = 0; iNotFinishedAmnt < notFinishedAmnt; iNotFinishedAmnt++){
+            Log.d("made some actions", "position not finished" + position);
+            position = roleAPosition();
+            if(position != -1) {
+
+                chosenBoatActions.add(createRandomUninishedAction(position));
+                iOverallPosition++;
+            }
+        }
+
+        Log.d("made some actions", "chosenBoatActions" + chosenBoatActions.size());
+        return chosenBoatActions.toArray(new BoatAction[chosenBoatActions.size()]);
+    }
+
+    private int roleAPosition(){
+
+        int maxSize = possibleActions.length -1;
+        if(maxSize <= 0) return -1;
+        return random.nextInt(maxSize);
+    }
+
+    private BoatAction createRandomFinishedAction(int position){
+
+        PossibleAction possibleAction = possibleActions[position];
+
+        String actionRef = possibleAction.actionType.name() + possibleAction.name;
+        BoatAction action = new BoatAction(possibleAction.name, 0, 0, actionRef, possibleAction.states);
+        return action;
+    }
+
+
+    private BoatAction createRandomUninishedAction(int position){
+        PossibleAction possibleAction = possibleActions[position];
+        String actionRef = possibleAction.actionType.name() + possibleAction.name;
+        BoatAction action = new BoatAction(possibleAction.name, 0, 1, actionRef, possibleAction.states);
+        return action;
+    }
+
+    public BoatAction createAction(String actionName, int target, int current, String onActionState, String offActionState){
+        String[] tempStates = {onActionState,offActionState};
+        return new BoatAction(actionName, target, current, "0", Arrays.copyOf(tempStates, tempStates.length));
+    }
+
+    public BoatAction createAction(String actionName, int target, int current, String[] states){
+        return new BoatAction(actionName, target, current, "0", Arrays.copyOf(states, states.length));
+    }
+
+
+
 }

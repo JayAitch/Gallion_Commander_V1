@@ -19,8 +19,11 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,14 +47,20 @@ public class BoatConnector {
     private final String BOAT_COLLECTION = "boats/";
     private final String  ACTIVITIES_COLLECTION = "/activities";
     private enum boatState{TRAVELLING,COMPLETE,DEAD};
+    private ActionCreator actionCreator;
+    private ListenerRegistration collectionListener;
+    private ListenerRegistration boatListener;
 
     public BoatConnector (MainGameActivity activity, int playerPosition){
         this.activity = activity; //temprory
         this.playerPosition = playerPosition; //temp
         db = FirebaseFirestore.getInstance();
         instructionManager = new InstructionManager();
-        boatActions = new HashMap<>();
 
+        actionCreator = new ActionCreator();
+        ProgressBar progressBar = activity.findViewById(R.id.instruction_progress_bar);
+        TextView instructionText = activity.findViewById(R.id.instruction_text);
+        instructionTicker = new InstructionTicker(this, progressBar, instructionText, GameSettings.BASE_INSTRUCTION_TIMER);
     }
 
 
@@ -59,7 +68,7 @@ public class BoatConnector {
     public void formBoatFromDocument(final String documentID){
         boatDocument = db.document(BOAT_COLLECTION + documentID);
         activitiesCollection = boatDocument.collection(ACTIVITIES_COLLECTION);
-
+        boatActions = new HashMap<>();
 
         boatDocument.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -101,8 +110,15 @@ public class BoatConnector {
 
 
 
+
+
+    }
+
+
+
+    private void createListeners(){
         // setup something to remove/ add these on pause/play
-        activitiesCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        collectionListener = activitiesCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 for(DocumentChange change: queryDocumentSnapshots.getDocumentChanges()){
@@ -114,21 +130,25 @@ public class BoatConnector {
             }
         });
 
-        boatDocument.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        boatListener = boatDocument.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
 
             }
         });
-
     }
+
+
 
     public int getActionsRemainingAmount(){
         return instructionManager.getInstructionsSize();
     }
 
+
+
     private void loadAfterBoatInit(int size, int current){
         if(current == size){
+            createListeners();
             instructionManager.setRandomInstruction();
             initInstructionTicker();
             activity.updateUI();
@@ -138,10 +158,8 @@ public class BoatConnector {
 
     // probably not here
     private void initInstructionTicker(){
-        ProgressBar progressBar = activity.findViewById(R.id.instruction_progress_bar);
-        TextView instructionText = activity.findViewById(R.id.instruction_text);
-        instructionTicker = new InstructionTicker(this, progressBar, instructionText, GameSettings.BASE_INSTRUCTION_TIMER);
         instructionTicker.displayInstructionText();
+        instructionTicker.startTimer();
     }
 
 
@@ -159,7 +177,7 @@ public class BoatConnector {
         return isShowingToPlayer;
     }
 
-
+    // move to action creator
     private BoatAction createActionFromDocumentData(QueryDocumentSnapshot document){
         String name = document.get("name", String.class);
         int target = document.get("target", Integer.class);
@@ -172,11 +190,12 @@ public class BoatConnector {
 
 
     public void boatActivityChangeCallback(QueryDocumentSnapshot documentSnapshot){
+
         currentBoat.setLocalValue(documentSnapshot.getId(), documentSnapshot.get("current", Integer.class));
         manageInstructionList(currentBoat.actions.get(documentSnapshot.getId()));
         activity.updateUI();
 
-
+            // do this by listening to a value on the document
        if(getBoatState() == boatState.COMPLETE){
             stopGame();
             testNewLevel();
@@ -234,18 +253,20 @@ public class BoatConnector {
 
     private void manageInstructionList(BoatAction action) {
 
-        instructionManager.manageInstructionList(action);
-        if(instructionManager.isCurrentInstruction(action.documentReference) && action.isActionComplete()){
-            instructionManager.setRandomInstruction();
-            currentInstructionComplete();
-        }
+
+
+
+            instructionManager.manageInstructionList(action);
+            if (instructionManager.isCurrentInstruction(action.documentReference) && action.isActionComplete()) {
+                instructionManager.setRandomInstruction();
+                currentInstructionComplete();
+            }
 
     }
 
 
 
     public String getCurrentInstructionString(){
-        Log.d("getting instruction", "" + currentBoat.livesRemaining);
 
         switch (getBoatState()){
             case DEAD:
@@ -278,7 +299,7 @@ public class BoatConnector {
     }
 
    public boatState getBoatState(){
-        boatState state = boatState.TRAVELLING;
+        boatState state;
        if(!currentBoat.isBoatAlive()) {
            state = boatState.DEAD;
        }
@@ -291,13 +312,22 @@ public class BoatConnector {
         return state;
    }
 
-    private void testNewLevel(){
-//        activity.removeAllActionButtons();
-//        String[] tempStates4 = {"somehthing","somthing else"};
-//        BoatAction newBoatAction = new BoatAction("Level2 thing", 0, 1, "3", Arrays.copyOf(tempStates4, tempStates4.length));
-//        activitiesCollection.add(newBoatAction.getDocumentValues());
-//        formBoatFromDocument(boatDocument.getId());
 
+    private void testNewLevel(){
+        activity.removeAllActionButtons();
+        collectionListener.remove();
+        boatListener.remove();
+        if(playerPosition == 0) {
+
+            BoatAction[] newActions = actionCreator.getRandomActions(0, 10);
+
+            for (int iActionsIterator = 0; iActionsIterator < newActions.length; iActionsIterator++) {
+
+                BoatAction newBoatAction = newActions[iActionsIterator];
+                activitiesCollection.document(newBoatAction.documentReference).set(newBoatAction.getDocumentValues());
+            }
+        }
+        formBoatFromDocument(boatDocument.getId());
     }
 
 
