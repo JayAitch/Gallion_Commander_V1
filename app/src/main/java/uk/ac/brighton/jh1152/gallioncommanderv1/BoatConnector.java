@@ -21,12 +21,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 
 public class BoatConnector {
@@ -36,8 +33,6 @@ public class BoatConnector {
     DocumentReference boatDocument;
     public Boat currentBoat;
     HashMap<String, BoatAction> boatActions;
-
-    private static Long INSTRUCTION_TIME = (long) 10000;
     private InstructionTicker instructionTicker;
     private InstructionManager instructionManager;
 
@@ -45,11 +40,10 @@ public class BoatConnector {
     MainGameActivity activity;
     int playerPosition;
     int playerAmnt;
-    Random random;
-    String documentReference;
 
     private final String BOAT_COLLECTION = "boats/";
     private final String  ACTIVITIES_COLLECTION = "/activities";
+    private enum boatState{TRAVELLING,COMPLETE,DEAD};
 
     public BoatConnector (MainGameActivity activity, int playerPosition){
         this.activity = activity; //temprory
@@ -57,7 +51,6 @@ public class BoatConnector {
         db = FirebaseFirestore.getInstance();
         instructionManager = new InstructionManager();
         boatActions = new HashMap<>();
-        random = new Random();
 
     }
 
@@ -147,7 +140,7 @@ public class BoatConnector {
     private void initInstructionTicker(){
         ProgressBar progressBar = activity.findViewById(R.id.instruction_progress_bar);
         TextView instructionText = activity.findViewById(R.id.instruction_text);
-        instructionTicker = new InstructionTicker(this, progressBar, instructionText, INSTRUCTION_TIME);
+        instructionTicker = new InstructionTicker(this, progressBar, instructionText, GameSettings.BASE_INSTRUCTION_TIMER);
         instructionTicker.displayInstructionText();
     }
 
@@ -182,7 +175,9 @@ public class BoatConnector {
         currentBoat.setLocalValue(documentSnapshot.getId(), documentSnapshot.get("current", Integer.class));
         manageInstructionList(currentBoat.actions.get(documentSnapshot.getId()));
         activity.updateUI();
-       if(areAllActivitiesComplete()){
+
+
+       if(getBoatState() == boatState.COMPLETE){
             stopGame();
             testNewLevel();
         }
@@ -211,29 +206,36 @@ public class BoatConnector {
 
     public void instructionTimeOut(){
         removeALife();
-        if (currentBoat.isBoatAlive()) {
-            instructionManager.setRandomInstruction();
-            instructionTicker.displayInstructionText();
-            instructionTicker.startTimer();
-            if(areAllActivitiesComplete()){
+
+        switch (getBoatState()) {
+            case DEAD:
                 stopGame();
-                //testNewLevel();
-            }
+                break;
+            case TRAVELLING:
+                instructionManager.setRandomInstruction();
+                instructionTicker.displayInstructionText();
+                instructionTicker.startTimer();
+                break;
+            case COMPLETE:
+                stopGame();
+                break;
         }
-        else{
-            instructionTicker.displayInstructionText();
-        }
+        instructionTicker.displayInstructionText();
+
     }
 
 
     private void stopGame(){
+        instructionManager.removeCurrentInstruction();
         instructionTicker.stopTimer();
     }
+
+
 
     private void manageInstructionList(BoatAction action) {
 
         instructionManager.manageInstructionList(action);
-        if(instructionManager.isCurrentInstruction(action.documentReference)){
+        if(instructionManager.isCurrentInstruction(action.documentReference) && action.isActionComplete()){
             instructionManager.setRandomInstruction();
             currentInstructionComplete();
         }
@@ -241,20 +243,26 @@ public class BoatConnector {
     }
 
 
+
     public String getCurrentInstructionString(){
         Log.d("getting instruction", "" + currentBoat.livesRemaining);
-        if(!currentBoat.isBoatAlive()) {
-            return "Game Over!";
+
+        switch (getBoatState()){
+            case DEAD:
+                return "Game Over!";
+            case COMPLETE:
+                return "Complete!";
+            case TRAVELLING:
+                if(!instructionManager.hasAnInstruction()){
+                    return "";
+                }
+                else{
+                    return instructionManager.getCurrentInstructionString();
+                }
+            default:
+                return "";
         }
-        else if(areAllActivitiesComplete()){
-            return "Complete!";
-        }
-        else if(!instructionManager.hasAnInstruction()){
-            return "";
-        }
-        else{
-            return instructionManager.getCurrentInstructionString();
-        }
+
 
     }
 
@@ -269,7 +277,19 @@ public class BoatConnector {
         return isComplete;
     }
 
-
+   public boatState getBoatState(){
+        boatState state = boatState.TRAVELLING;
+       if(!currentBoat.isBoatAlive()) {
+           state = boatState.DEAD;
+       }
+       else if(areAllActivitiesComplete()){
+           state = boatState.COMPLETE;
+       }
+       else{
+           state = boatState.TRAVELLING;
+       }
+        return state;
+   }
 
     private void testNewLevel(){
 //        activity.removeAllActionButtons();

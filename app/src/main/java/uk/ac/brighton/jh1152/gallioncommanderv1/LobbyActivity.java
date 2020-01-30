@@ -48,7 +48,7 @@ public class LobbyActivity extends AppCompatActivity {
     DocumentReference lobbyDocument;
     ListenerRegistration lobbyListener;
     Map<String, Object> lobbyData;
-    WriteBatch activitiesBatch;
+
     int thisPlayerNumber;
     public static final String EXTRA_BOAT_ID = "uk.ac.brighton.jh1152.gallioncommanderv1.BOATID";
     public static final String EXTRA_PLAYER_NUMBER = "uk.ac.brighton.jh1152.gallioncommanderv1.PLAYERNUMBER";
@@ -208,7 +208,7 @@ public class LobbyActivity extends AppCompatActivity {
 
     private void createNewBoatAndSetReference(){
         Map<String, Object> newBoat = new HashMap<>();
-        newBoat.put("lives", 10);
+        newBoat.put("lives", GameSettings.BASE_BOAT_LIVES);
         newBoat.put("players", lobbyData.get("players"));
 
 
@@ -219,13 +219,11 @@ public class LobbyActivity extends AppCompatActivity {
 
                 for(BoatAction action: boatActions){
 
-                    db.collection("boats/"+ newBoatReferenceID +"/activities").add(action.getDocumentValues()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    db.collection("boats/"+ newBoatReferenceID +"/activities").document(action.actionName).set(action.getDocumentValues()).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
-                        public void onSuccess(DocumentReference documentReference) {
-                            Log.d("<<<<<<<<<<<<<<<<<<<", "created new boat reference" + newBoatReferenceID);
+                        public void onSuccess(Void aVoid) {
                             BoatActivtyCount++;
                             CheckIfFinishedCreatingActions(BoatActivtyCount);
-
                         }
                     });
                 }
