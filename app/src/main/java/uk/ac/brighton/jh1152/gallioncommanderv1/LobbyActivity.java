@@ -157,7 +157,7 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
     private BoatAction[] createBoatActionsCollection(){
-        return  actionCreator.getRandomActions(2,2);
+        return  actionCreator.getRandomActions(GameSettings.BASE_FINISHED_ACTIVITIES,GameSettings.BASE_UNFINISHED_ACTIVITIES);
     }
 
 

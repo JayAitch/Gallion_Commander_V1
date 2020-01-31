@@ -1,5 +1,8 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.CountDownTimer;
 import android.os.Debug;
 import android.util.Log;
@@ -23,6 +26,8 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.w3c.dom.Text;
+
 import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.List;
@@ -43,13 +48,20 @@ public class BoatConnector {
     MainGameActivity activity;
     int playerPosition;
     int playerAmnt;
-
+    int level = 0;
     private final String BOAT_COLLECTION = "boats/";
     private final String  ACTIVITIES_COLLECTION = "/activities";
     private enum boatState{TRAVELLING,COMPLETE,DEAD};
     private ActionCreator actionCreator;
     private ListenerRegistration collectionListener;
     private ListenerRegistration boatListener;
+
+
+
+    private Dialog levelCompleteDialogue;
+
+
+
 
     public BoatConnector (MainGameActivity activity, int playerPosition){
         this.activity = activity; //temprory
@@ -60,6 +72,7 @@ public class BoatConnector {
         actionCreator = new ActionCreator();
         ProgressBar progressBar = activity.findViewById(R.id.instruction_progress_bar);
         TextView instructionText = activity.findViewById(R.id.instruction_text);
+        testCreateDialogue();
         instructionTicker = new InstructionTicker(this, progressBar, instructionText, GameSettings.BASE_INSTRUCTION_TIMER);
     }
 
@@ -313,13 +326,26 @@ public class BoatConnector {
    }
 
 
+   private CountDownTimer testTimer;
+
+
+
+    private void testCreateDialogue(){
+
+
+        levelCompleteDialogue = new AlertDialog.Builder(activity)
+                .setTitle("Level Complete").setMessage("Moving on the next level in \n 5").create();
+    }
+
     private void testNewLevel(){
+
         activity.removeAllActionButtons();
         collectionListener.remove();
         boatListener.remove();
+        level++;
         if(playerPosition == 0) {
 
-            BoatAction[] newActions = actionCreator.getRandomActions(0, 10);
+            BoatAction[] newActions = actionCreator.getRandomActions(GameSettings.BASE_FINISHED_ACTIVITIES + (level * GameSettings.ACTIVITIES_PER_LEVEL), GameSettings.BASE_UNFINISHED_ACTIVITIES + (level * GameSettings.ACTIVITIES_PER_LEVEL));
 
             for (int iActionsIterator = 0; iActionsIterator < newActions.length; iActionsIterator++) {
 
@@ -327,10 +353,50 @@ public class BoatConnector {
                 activitiesCollection.document(newBoatAction.documentReference).set(newBoatAction.getDocumentValues());
             }
         }
-        formBoatFromDocument(boatDocument.getId());
+
+
+
+
+
+        levelCompleteDialogue.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(final DialogInterface dialogInterface) {
+
+
+                if(testTimer == null){
+                    testTimer = new CountDownTimer(5000, 1000) {
+                        int timeLeft = 3;
+                        final TextView messageText =  levelCompleteDialogue.findViewById(android.R.id.message);
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            int secondsLeft = (int) millisUntilFinished / 1000;
+                            messageText.setText("Moving on the next level in " + secondsLeft);
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            triggerNewLevelLoad();
+                            levelCompleteDialogue.dismiss();
+                        }
+                    };
+                    testTimer.start();
+                }
+                else{
+                    testTimer.start();
+                }
+            }
+        });
+        levelCompleteDialogue.show();
+
+
+
     }
 
+    private void triggerNewLevelLoad(){
 
+
+        formBoatFromDocument(boatDocument.getId());
+    }
 
 
 

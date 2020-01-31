@@ -101,4 +101,10 @@ public class MainGameActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    @Override
+    public void onBackPressed() {
+
+        Intent intent = new Intent(this, LandingActivity.class);
+        startActivity(intent);
+    }
 }
