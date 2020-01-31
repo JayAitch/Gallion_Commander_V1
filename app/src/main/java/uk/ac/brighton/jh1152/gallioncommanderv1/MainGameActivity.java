@@ -1,8 +1,12 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.GridLayout;
+import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import java.util.HashMap;
@@ -57,7 +61,7 @@ public class MainGameActivity extends AppCompatActivity {
     public void removeAllActionButtons(){
         boatActionButtons.clear();
         Log.d("removing actions buttons <<<<, ", "" + boatActionButtons.size());
-        TableLayout layout = (TableLayout) findViewById(R.id.tableLayout);
+        LinearLayout layout = (LinearLayout) findViewById(R.id.activitiesGrid);
         layout.removeAllViews();
 
     }

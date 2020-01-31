@@ -9,69 +9,80 @@
     tools:context=".MainGameActivity">
 
     <LinearLayout
-        android:id="@+id/linearLayout3"
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/tableLayout"
-        tools:layout_editor_absoluteX="-48dp">
-
-        <TextView
-            android:id="@+id/instruction_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            android:textAlignment="center" />
-
-        <ProgressBar
-            android:id="@+id/instruction_progress_bar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#00000000"
-            android:indeterminate="false"
-            android:progress="95"
-            android:progressTint="#F80202" />
-    </LinearLayout>
-
-    <TableLayout
-        android:id="@+id/tableLayout"
-        android:layout_width="409dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="200dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TableRow
+        <LinearLayout
+            android:id="@+id/linearLayout3"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="64dp"
+            android:orientation="vertical">
 
-        <TableRow
+            <TextView
+                android:id="@+id/instruction_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textAlignment="center" />
+
+            <ProgressBar
+                android:id="@+id/instruction_progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#00000000"
+                android:indeterminate="false"
+                android:progress="95"
+                android:progressTint="#F80202" />
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/scrollView2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="fill_parent"
+            android:layout_weight="1">
 
-        <TableRow
+            <LinearLayout
+                android:id="@+id/activitiesGrid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#00D5B7B7"
+                android:backgroundTint="#00634444"
+                android:foregroundTint="#00B90B0B"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:scrollbars="vertical">
+
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="32dp"
+            android:orientation="horizontal">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </TableLayout>
+            <TextView
+                android:id="@+id/instructions_size_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:text="TextView" />
 
-    <TextView
-        android:id="@+id/instructions_size_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+            <TextView
+                android:id="@+id/lives_remaining_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:text="TextView"
+                android:textAlignment="viewEnd" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/lives_remaining_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

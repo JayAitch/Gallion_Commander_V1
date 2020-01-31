@@ -2,11 +2,19 @@ package uk.ac.brighton.jh1152.gallioncommanderv1;
 
 import android.app.Activity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+
+import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+
+import androidx.gridlayout.widget.GridLayout;
+
+
 
 
 public class BoatActionToggle implements IBaseBoatActionUI {
@@ -24,22 +32,42 @@ public class BoatActionToggle implements IBaseBoatActionUI {
 
         button = (Button) new Button(activity);
         toggleSwitch = (Switch) new Switch(activity);
-        TableLayout layout = (TableLayout) activity.findViewById(R.id.tableLayout);
+
+        LinearLayout layout = (LinearLayout) activity.findViewById(R.id.activitiesGrid);
         toggleSwitch.setShowText(true);
         toggleSwitch.setText(boatAction.actionName);
+        toggleSwitch.setTextSize(18);
+        // create this all in xml
+        toggleSwitch.setGravity(Gravity.FILL_HORIZONTAL);
+        toggleSwitch.setTextOff(boatAction.states[1]);
+        toggleSwitch.setTextOn(boatAction.states[0]);
+       // toggleSwitch.setWidth(666);
 
-        toggleSwitch.setTextOff(boatAction.states[0]);
-        toggleSwitch.setTextOn(boatAction.states[1]);
+        toggleSwitch.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+
+        toggleSwitch.setSwitchPadding(48);
+        toggleSwitch.setSwitchMinWidth(58);
+
+
+
+
+        toggleSwitch.setBackgroundColor(toggleSwitch.getContext().getResources().getColor(R.color.panelBackground));
+
+        toggleSwitch.setPadding(32,32,32, 32);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(24, 24, 24, 24);
+
+        toggleSwitch.setLayoutParams(params);
+
+
+
+
         layout.addView(toggleSwitch);
-        layout.addView(button);
         setTextValue();
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SetBoatAction();
-            }
-        });
         toggleSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -53,7 +81,7 @@ public class BoatActionToggle implements IBaseBoatActionUI {
         isToggled = (action.actionCurrent == 1);
        String buttonTextPrefix = action.states[isToggled ? 0: 1];
        String buttonText =  buttonTextPrefix + " the " + action.actionName;
-       button.setText((CharSequence) buttonText);
+     //  button.setText((CharSequence) buttonText);
        toggleSwitch.setChecked(isToggled);
     }
 

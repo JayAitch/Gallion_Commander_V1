@@ -28,7 +28,7 @@ public class ActionCreator {
 
     public ActionCreator(){
         random = new Random();
-        possibleActions = new PossibleAction[8];
+        possibleActions = new PossibleAction[15];
         String[] tempStates = {"release","capture"};
         possibleActions[0] = new PossibleAction("Kraken", Arrays.copyOf(tempStates, tempStates.length), actionTypes.TOGGLE);
 
@@ -52,6 +52,28 @@ public class ActionCreator {
 
         String[] tempStates8 = {"start", "stop"};
         possibleActions[7] =new PossibleAction("ERRing",Arrays.copyOf(tempStates8, tempStates8.length), actionTypes.TOGGLE);
+
+        String[] tempStates9 = {"on deck!", "down bellow!"};
+        possibleActions[8] =new PossibleAction("All hands", Arrays.copyOf(tempStates9, tempStates9.length), actionTypes.TOGGLE);
+
+        String[] tempStates10 = {"Avast", "Back to duties"};
+        possibleActions[9] =new PossibleAction("Me harties", Arrays.copyOf(tempStates10, tempStates10.length), actionTypes.TOGGLE);
+
+        String[] tempStates11 = {"Sing", "Silence"};
+        possibleActions[10] =new PossibleAction("Shanty", Arrays.copyOf(tempStates11, tempStates9.length), actionTypes.TOGGLE);
+
+        String[] tempStates12 = {"recover", "throw"};
+        possibleActions[11] =new PossibleAction("Gold", Arrays.copyOf(tempStates12, tempStates12.length), actionTypes.TOGGLE);
+
+        String[] tempStates13 = {"down", "up"};
+
+        possibleActions[12] =new PossibleAction("Anchors", Arrays.copyOf(tempStates13, tempStates9.length), actionTypes.TOGGLE);
+
+        String[] tempStates14 = {"Man", "Unman"};
+        possibleActions[13] =new PossibleAction("Helm", Arrays.copyOf(tempStates14, tempStates9.length), actionTypes.TOGGLE);
+
+        String[] tempStates15 = {"Start", "Stop"};
+        possibleActions[14] =new PossibleAction("Fishing", Arrays.copyOf(tempStates15, tempStates9.length), actionTypes.TOGGLE);
 
     }
 
@@ -103,10 +125,19 @@ public class ActionCreator {
 
 
     private BoatAction createRandomUninishedAction(int position){
+        BoatAction boatAction;
         PossibleAction possibleAction = possibleActions[position];
         String actionRef = possibleAction.actionType.name() + possibleAction.name;
-        BoatAction action = new BoatAction(possibleAction.name, 0, 1, actionRef, possibleAction.states);
-        return action;
+        int roll = random.nextInt(10);
+
+        if(roll > 5){
+            boatAction= new BoatAction(possibleAction.name, 0, 1, actionRef, possibleAction.states);
+        }
+        else{
+            boatAction= new BoatAction(possibleAction.name, 1, 0, actionRef, possibleAction.states);
+        }
+
+        return boatAction;
     }
 
     public BoatAction createAction(String actionName, int target, int current, String onActionState, String offActionState){

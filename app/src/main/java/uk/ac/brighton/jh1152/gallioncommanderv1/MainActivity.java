@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
     Button[] button;
 
     void createActionsFromSnapshot(){
-        final TableLayout layout = (TableLayout) findViewById(R.id.tableLayout);
+   //     final TableLayout layout = (TableLayout) findViewById(R.id.tableLayout);
         itterator = 0;
         CollectionReference actionscollection = db.collection("games/CpSBjqsXuGt9b9wdLYDi/actions");
         final AppCompatActivity content = this;
@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                         int current = (int)(long)document.get("current");
               //          currentActions[itterator] = new BoatAction(name, target, current, document.getId());
                         CustomButton newButton = new CustomButton(itterator, content);
-                        layout.addView(newButton);
+            //            layout.addView(newButton);
                         itterator++;
                     }
 

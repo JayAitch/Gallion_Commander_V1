@@ -2,6 +2,8 @@ package uk.ac.brighton.jh1152.gallioncommanderv1;
 
 import android.app.Activity;
 import android.view.View;
+import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TableLayout;
 
@@ -19,7 +21,7 @@ public class BoatActionSlider implements IBaseBoatActionUI {
         action = boatAction;
 
 
-        TableLayout layout = (TableLayout) activity.findViewById(R.id.tableLayout);
+        LinearLayout layout = (LinearLayout) activity.findViewById(R.id.activitiesGrid);
         slider = new SeekBar(activity);
         layout.addView(slider);
         setTextValue();
