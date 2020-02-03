@@ -28,52 +28,58 @@ public class ActionCreator {
 
     public ActionCreator(){
         random = new Random();
-        possibleActions = new PossibleAction[15];
+        possibleActions = new PossibleAction[6];
         String[] tempStates = {"release","capture"};
         possibleActions[0] = new PossibleAction("Kraken", Arrays.copyOf(tempStates, tempStates.length), actionTypes.TOGGLE);
 
         String[] tempStates2 = {"unload","load"};
         possibleActions[1] = new PossibleAction("Cannons",  Arrays.copyOf(tempStates2, tempStates2.length), actionTypes.TOGGLE);
 
-        String[] tempStates3 = {"raise","lower"};
+       String[] tempStates3 = {"raise","lower"};
         possibleActions[2] = new PossibleAction("Jolly Rodger",  Arrays.copyOf(tempStates3, tempStates3.length), actionTypes.TOGGLE);
 
-        String[] tempStates4 = {"down","up"};
+        String[] tempStates4 = {"down","ready","up"};
         possibleActions[3] = new PossibleAction("Rudder",  Arrays.copyOf(tempStates4, tempStates4.length), actionTypes.TOGGLE);
+//
+//        String[] tempStates5 = {"unfurl", "furl"};
+//        possibleActions[4] =new PossibleAction("Sails",  Arrays.copyOf(tempStates5, tempStates5.length), actionTypes.TOGGLE);
+//
+//        String[] tempStates6 = {"stow","get out"};
+//        possibleActions[5] =new PossibleAction("Rum", Arrays.copyOf(tempStates6, tempStates6.length), actionTypes.TOGGLE);
+//
+//        String[] tempStates7 = {"cage", "uncage"};
+//        possibleActions[6] =new PossibleAction("Parrot", Arrays.copyOf(tempStates7, tempStates7.length), actionTypes.TOGGLE);
+//
+//        String[] tempStates8 = {"start", "stop"};
+//        possibleActions[7] =new PossibleAction("ERRing",Arrays.copyOf(tempStates8, tempStates8.length), actionTypes.TOGGLE);
 
-        String[] tempStates5 = {"cut","fix"};
-        possibleActions[4] =new PossibleAction("Sails",  Arrays.copyOf(tempStates5, tempStates5.length), actionTypes.TOGGLE);
+        String[] tempStates9 = {"quarter mast", "half mast", "full-mast"};
+        possibleActions[4] =new PossibleAction("Sails",  Arrays.copyOf(tempStates9, tempStates9.length), actionTypes.TOGGLE);
 
-        String[] tempStates6 = {"stow","get out"};
-        possibleActions[5] =new PossibleAction("Rum", Arrays.copyOf(tempStates6, tempStates6.length), actionTypes.TOGGLE);
 
-        String[] tempStates7 = {"cage", "uncage"};
-        possibleActions[6] =new PossibleAction("Parrot", Arrays.copyOf(tempStates7, tempStates7.length), actionTypes.TOGGLE);
+        String[] tempStates5 = {"North", "East", "South", "West"};
+        possibleActions[5] =new PossibleAction("Direction",  Arrays.copyOf(tempStates5, tempStates5.length), actionTypes.TOGGLE);
 
-        String[] tempStates8 = {"start", "stop"};
-        possibleActions[7] =new PossibleAction("ERRing",Arrays.copyOf(tempStates8, tempStates8.length), actionTypes.TOGGLE);
 
-        String[] tempStates9 = {"on deck!", "down bellow!"};
-        possibleActions[8] =new PossibleAction("All hands", Arrays.copyOf(tempStates9, tempStates9.length), actionTypes.TOGGLE);
 
-        String[] tempStates10 = {"Avast", "Back to duties"};
-        possibleActions[9] =new PossibleAction("Me harties", Arrays.copyOf(tempStates10, tempStates10.length), actionTypes.TOGGLE);
+//        String[] tempStates10 = {"Avast", "Back to duties"};
+//        possibleActions[9] =new PossibleAction("Me harties", Arrays.copyOf(tempStates10, tempStates10.length), actionTypes.TOGGLE);
 
-        String[] tempStates11 = {"Sing", "Silence"};
-        possibleActions[10] =new PossibleAction("Shanty", Arrays.copyOf(tempStates11, tempStates9.length), actionTypes.TOGGLE);
-
-        String[] tempStates12 = {"recover", "throw"};
-        possibleActions[11] =new PossibleAction("Gold", Arrays.copyOf(tempStates12, tempStates12.length), actionTypes.TOGGLE);
-
-        String[] tempStates13 = {"down", "up"};
-
-        possibleActions[12] =new PossibleAction("Anchors", Arrays.copyOf(tempStates13, tempStates9.length), actionTypes.TOGGLE);
-
-        String[] tempStates14 = {"Man", "Unman"};
-        possibleActions[13] =new PossibleAction("Helm", Arrays.copyOf(tempStates14, tempStates9.length), actionTypes.TOGGLE);
-
-        String[] tempStates15 = {"Start", "Stop"};
-        possibleActions[14] =new PossibleAction("Fishing", Arrays.copyOf(tempStates15, tempStates9.length), actionTypes.TOGGLE);
+//        String[] tempStates11 = {"Sing", "Silence"};
+//        possibleActions[10] =new PossibleAction("Shanty", Arrays.copyOf(tempStates11, tempStates11.length), actionTypes.TOGGLE);
+//
+//        String[] tempStates12 = {"recover", "throw"};
+//        possibleActions[11] =new PossibleAction("Gold", Arrays.copyOf(tempStates12, tempStates12.length), actionTypes.TOGGLE);
+//
+//        String[] tempStates13 = {"down", "up"};
+//
+//        possibleActions[12] =new PossibleAction("Anchors", Arrays.copyOf(tempStates13, tempStates13.length), actionTypes.TOGGLE);
+//
+//        String[] tempStates14 = {"Man", "Unman"};
+//        possibleActions[13] =new PossibleAction("Helm", Arrays.copyOf(tempStates14, tempStates14.length), actionTypes.TOGGLE);
+//
+//        String[] tempStates15 = {"Start", "Stop"};
+//        possibleActions[14] =new PossibleAction("Fishing", Arrays.copyOf(tempStates15, tempStates15.length), actionTypes.TOGGLE);
 
     }
 
@@ -109,7 +115,7 @@ public class ActionCreator {
 
     private int roleAPosition(){
 
-        int maxSize = possibleActions.length -1;
+        int maxSize = possibleActions.length;
         if(maxSize <= 0) return -1;
         return random.nextInt(maxSize);
     }

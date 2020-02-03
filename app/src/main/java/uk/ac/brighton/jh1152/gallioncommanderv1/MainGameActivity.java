@@ -4,10 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.GridLayout;
-import android.widget.GridView;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +29,8 @@ public class MainGameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         Intent intent = getIntent();
         gameID = intent.getStringExtra(LobbyActivity.EXTRA_BOAT_ID);
         playerNumber = intent.getIntExtra(LobbyActivity.EXTRA_PLAYER_NUMBER, -1);
@@ -46,8 +46,11 @@ public class MainGameActivity extends AppCompatActivity {
     }
 
 
+
     public void addActionButton(BoatAction action){
         IBaseBoatActionUI newUIAction;
+
+        // concider switching this to an enum
         if(action.states.length > 2){
             // consider not adding states at all
             newUIAction = new BoatActionSlider(this, boatConnector.currentBoat, action);
@@ -72,7 +75,7 @@ public class MainGameActivity extends AppCompatActivity {
 
         for (Map.Entry<String, IBaseBoatActionUI> entry: boatActionButtons.entrySet()) {
             IBaseBoatActionUI UIAction = entry.getValue();
-            UIAction.setTextValue();
+            UIAction.valueChangeCallback();
         }
 
         displayActionsLeft();

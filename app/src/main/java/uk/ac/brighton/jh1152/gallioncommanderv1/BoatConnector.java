@@ -181,7 +181,7 @@ public class BoatConnector {
         boolean isShowingToPlayer = false;
         float activitiesPerUser = activitiesSize / (float)playerAmnt;
         int activitiesMin = (int)Math.floor(activitiesPerUser * playerPosition);
-        int activitesMax = (int)Math.ceil(activitiesMin + activitiesPerUser);
+        int activitesMax = (int)Math.floor(activitiesMin + activitiesPerUser);
 
 
         if(activityPosition <= activitesMax && activityPosition >= activitiesMin){
