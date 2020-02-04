@@ -66,6 +66,8 @@ public class InstructionManager {
         }
     }
 
+
+
     public void removeCurrentInstruction(){
         currentInstruction = null;
     }
