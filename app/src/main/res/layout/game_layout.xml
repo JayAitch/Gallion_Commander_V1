@@ -50,15 +50,15 @@
 
             <LinearLayout
                 android:id="@+id/activitiesGrid"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:background="#00D5B7B7"
                 android:backgroundTint="#00634444"
                 android:foregroundTint="#00B90B0B"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
-                android:scrollbars="vertical">
-
+                android:scrollbars="vertical"
+                >
             </LinearLayout>
         </ScrollView>
 
