@@ -1,11 +1,8 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 
 import android.app.Activity;
-import android.view.View;
-import android.widget.Button;
 
 import android.widget.LinearLayout;
-import android.widget.Switch;
 
 
 public class BoatActionToggle implements IBaseBoatActionUI {
@@ -14,19 +11,30 @@ public class BoatActionToggle implements IBaseBoatActionUI {
     Boat lBoat;
     BoatAction action;
     boolean isToggled;
-    ActionLayoutWithToggleButton actionButton;
+    ControlToggleButton actionButton;
 
     public BoatActionToggle(Activity activity, Boat boat, BoatAction boatAction) {
         lBoat = boat;
         action = boatAction;
-        actionButton = (ActionLayoutWithToggleButton) new ActionLayoutWithToggleButton(activity, action.actionName, action.states, action.actionCurrent);
+        actionButton = (ControlToggleButton) new ControlToggleButton(activity, action.actionName, action.states, action.actionCurrent);
 
         LinearLayout layout = (LinearLayout) activity.findViewById(R.id.activitiesGrid);
         layout.addView(actionButton);
         valueChangeCallback();
-        actionButton.setOnClickListener(new View.OnClickListener() {
+
+        actionButton.setControlListener(new IControlListener() {
             @Override
-            public void onClick(View v) {
+            public void onControlChange(int value) {
+
+            }
+
+            @Override
+            public void onControlStopTouch() {
+
+            }
+
+            @Override
+            public void onControlStartTouch() {
                 SetBoatAction();
             }
         });

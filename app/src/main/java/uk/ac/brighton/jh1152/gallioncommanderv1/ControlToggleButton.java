@@ -3,6 +3,7 @@ package uk.ac.brighton.jh1152.gallioncommanderv1;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -11,28 +12,28 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 
-public class ActionLayoutWithToggleButton extends LinearLayout {
+public class ControlToggleButton extends LinearLayout implements ICustomControl{
 
     String name;
     String[] stateNames;
     TextView nameText;
     Button button;
 
-    public ActionLayoutWithToggleButton(Context context) {
+    public ControlToggleButton(Context context) {
         super(context);
     }
 
-    public ActionLayoutWithToggleButton(Context context, @Nullable AttributeSet attrs) {
+    public ControlToggleButton(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public ActionLayoutWithToggleButton(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ControlToggleButton(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
 
 
-    public ActionLayoutWithToggleButton(Context context, String name, String[] stateNames, int currentValue) {
+    public ControlToggleButton(Context context, String name, String[] stateNames, int currentValue) {
         super(context);
         this.name = name;
         this.stateNames = stateNames;
@@ -51,7 +52,14 @@ public class ActionLayoutWithToggleButton extends LinearLayout {
         button.setText(stateNames[statePosition]);
     }
 
-    public void setOnClickListener(OnClickListener listener){
-        button.setOnClickListener(listener);
+    @Override
+    public void setControlListener(final IControlListener controlListener) {
+        button.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                controlListener.onControlStartTouch();
+            }
+        });
     }
+
 }

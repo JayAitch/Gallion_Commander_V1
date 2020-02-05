@@ -10,7 +10,10 @@ public class BoatActionSlider implements IBaseBoatActionUI {
     int currentValue;
     Boat lBoat;
     BoatAction action;
-    NamedSeekBarWithText seekbarWithText;
+    ControlSeekBarWithText seekbarWithText; // make generic should be able to have any multivalue actio on here
+    ControlKnob testKnob; //temp
+
+
 
     public BoatActionSlider(Activity activity, Boat boat, BoatAction boatAction) {
         lBoat = boat;
@@ -18,34 +21,33 @@ public class BoatActionSlider implements IBaseBoatActionUI {
 
         LinearLayout layout = (LinearLayout) activity.findViewById(R.id.activitiesGrid);
 
-        seekbarWithText = new NamedSeekBarWithText(activity, action.actionName, action.states, action.actionCurrent);
-
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
+        seekbarWithText = new ControlSeekBarWithText(activity, action.actionName, action.states, action.actionCurrent);
 
         layout.addView(seekbarWithText);
 
+//temp
+
+
+        testKnob = new ControlKnob(activity, action.actionName, action.states, action.actionCurrent);
+        layout.addView(testKnob);
 
 
 
-        seekbarWithText.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        seekbarWithText.setControlListener(new IControlListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                currentValue = progress;
+            public void onControlChange(int value) {
+                currentValue = value;
                 seekbarWithText.setCurrentValue(currentValue);
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
+            public void onControlStopTouch() {
+                SetBoatAction();
             }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                SetBoatAction();
+            public void onControlStartTouch() {
+
             }
         });
     }
@@ -59,6 +61,8 @@ public class BoatActionSlider implements IBaseBoatActionUI {
 
     @Override
     public void valueChangeCallback() {
+
         seekbarWithText.setCurrentValue(action.actionCurrent);
+        testKnob.setCurrentValue(action.actionCurrent);
     }
 }

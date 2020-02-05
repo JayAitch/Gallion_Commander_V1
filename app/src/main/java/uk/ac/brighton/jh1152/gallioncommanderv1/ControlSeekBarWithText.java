@@ -7,7 +7,7 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class NamedSeekBarWithText extends LinearLayout {
+public class ControlSeekBarWithText extends LinearLayout implements  ICustomControl{
 
     String name;
     String[] stateNames;
@@ -16,20 +16,20 @@ public class NamedSeekBarWithText extends LinearLayout {
     SeekBar seekBar;
 
 
-    public NamedSeekBarWithText(Context context) {
+    public ControlSeekBarWithText(Context context) {
         super(context);
     }
 
 
-    public NamedSeekBarWithText(Context context, AttributeSet attrs) {
+    public ControlSeekBarWithText(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public NamedSeekBarWithText(Context context, AttributeSet attrs, int defStyleAttr) {
+    public ControlSeekBarWithText(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
-    public NamedSeekBarWithText(Context context, String name, String[] stateNames, int currentValue) {
+    public ControlSeekBarWithText(Context context, String name, String[] stateNames, int currentValue) {
         super(context);
         this.name = name;
         this.stateNames = stateNames;
@@ -51,8 +51,30 @@ public class NamedSeekBarWithText extends LinearLayout {
         seekBar.setProgress(statePosition);
     }
 
+    @Override
+    public void setControlListener(final IControlListener controlListener) {
+
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                controlListener.onControlChange(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                controlListener.onControlStartTouch();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                controlListener.onControlStopTouch();
+            }
+        });
+    }
+/**
     public void setOnSeekBarChangeListener(SeekBar.OnSeekBarChangeListener listener){
         seekBar.setOnSeekBarChangeListener(listener);
     }
-
+**/
 }
