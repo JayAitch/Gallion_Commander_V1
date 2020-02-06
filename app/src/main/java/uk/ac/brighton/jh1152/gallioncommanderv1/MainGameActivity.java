@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.HashMap;
@@ -54,7 +53,7 @@ public class MainGameActivity extends AppCompatActivity {
         // concider switching this to an enum
         if(action.states.length > 2){
             // consider not adding states at all
-            newUIAction = new BoatActionSlider(this, boatConnector.currentBoat, action);
+            newUIAction = new BoatActionMultiState(this, boatConnector.currentBoat, action);
         }else{
             newUIAction = new BoatActionToggle(this, boatConnector.currentBoat,  action);
         }

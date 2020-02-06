@@ -5,7 +5,7 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
 
-public class BoatActionSlider implements IBaseBoatActionUI {
+public class BoatActionMultiState implements IBaseBoatActionUI {
 
     int currentValue;
     Boat lBoat;
@@ -15,7 +15,7 @@ public class BoatActionSlider implements IBaseBoatActionUI {
 
 
 
-    public BoatActionSlider(Activity activity, Boat boat, BoatAction boatAction) {
+    public BoatActionMultiState(Activity activity, Boat boat, BoatAction boatAction) {
         lBoat = boat;
         action = boatAction;
 
@@ -30,7 +30,22 @@ public class BoatActionSlider implements IBaseBoatActionUI {
 
         testKnob = new ControlKnob(activity, action.actionName, action.states, action.actionCurrent);
         layout.addView(testKnob);
+        testKnob.setControlListener(new IControlListener() {
+            @Override
+            public void onControlChange(int value) {
 
+            }
+
+            @Override
+            public void onControlStopTouch() {
+
+            }
+
+            @Override
+            public void onControlStartTouch() {
+
+            }
+        });
 
 
         seekbarWithText.setControlListener(new IControlListener() {
