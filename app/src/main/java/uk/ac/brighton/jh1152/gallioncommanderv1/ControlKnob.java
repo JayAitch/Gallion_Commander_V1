@@ -1,14 +1,9 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
-
-import android.content.ClipData;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.DragEvent;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -23,7 +18,6 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
     TextView nameText;
     String name;
     String[] stateNames;
-    GestureDetector gestureDetector;
     int currentValue;
 
 
@@ -55,7 +49,7 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
         nameText = (TextView) findViewById(R.id.nameText);
         //stateText = (TextView) findViewById(R.id.stateText);
         controlKnob =(ImageView) findViewById(R.id.control_knob);
-
+        nameText.setText(name);
 
     }
 

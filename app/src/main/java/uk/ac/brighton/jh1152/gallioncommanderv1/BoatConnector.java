@@ -195,9 +195,10 @@ public class BoatConnector {
         String name = document.get("name", String.class);
         int target = document.get("target", Integer.class);
         int current = document.get("current", Integer.class);
+        String controlType = document.get("type", String.class);
         List<String> states = (List<String>) document.get("states");
         String[] statesArray = states.toArray(new String[states.size()]);
-        BoatAction boatAction = new BoatAction(name, target, current, document.getId(), statesArray);
+        BoatAction boatAction = new BoatAction(name,BoatActionControlType.valueOf(controlType), target, current, document.getId(), statesArray);
         return boatAction;
     }
 

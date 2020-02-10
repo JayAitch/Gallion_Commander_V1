@@ -51,12 +51,12 @@ public class MainGameActivity extends AppCompatActivity {
         IBaseBoatActionUI newUIAction;
 
         // concider switching this to an enum
-        if(action.states.length > 2){
+   //     if(action.states.length > 2){
             // consider not adding states at all
             newUIAction = new BoatActionMultiState(this, boatConnector.currentBoat, action);
-        }else{
-            newUIAction = new BoatActionToggle(this, boatConnector.currentBoat,  action);
-        }
+   //     }else{
+     //       newUIAction = new BoatActionToggle(this, boatConnector.currentBoat,  action);
+//        }
 
         boatActionButtons.put(action.documentReference, newUIAction);
     }

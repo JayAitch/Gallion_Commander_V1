@@ -2,6 +2,7 @@ package uk.ac.brighton.jh1152.gallioncommanderv1;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ public class ControlToggleButton extends LinearLayout implements ICustomControl{
     String[] stateNames;
     TextView nameText;
     Button button;
+    Boolean isToggled;
 
     public ControlToggleButton(Context context) {
         super(context);
@@ -44,12 +46,16 @@ public class ControlToggleButton extends LinearLayout implements ICustomControl{
     private void createViewObjects(){
         LayoutInflater.from(getContext()).inflate(R.layout.action_button, this);
         nameText = (TextView) findViewById(R.id.nameText);
-        button =(Button) findViewById(R.id.actionButton);
+        button = (Button) findViewById(R.id.actionButton);
         nameText.setText(name);
     }
 
+    @Override
     public void setCurrentValue(int statePosition){
-        button.setText(stateNames[statePosition]);
+        // only allow data to set the value
+        isToggled = (statePosition != 0);
+        String buttonText = stateNames[isToggled ? 0 : 1];
+        button.setText(buttonText);
     }
 
     @Override
@@ -57,7 +63,8 @@ public class ControlToggleButton extends LinearLayout implements ICustomControl{
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                controlListener.onControlStartTouch();
+                controlListener.onControlChange(!isToggled ? 1 : 0);
+                controlListener.onControlStopTouch();
             }
         });
     }

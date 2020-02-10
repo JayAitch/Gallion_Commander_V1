@@ -1,6 +1,5 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 
-import android.os.Debug;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -9,16 +8,18 @@ import java.util.Random;
 
 public class ActionCreator {
 
-    private enum actionTypes {TOGGLE, SLIDER}
+    private enum actionControlType {TOGGLE, SLIDER, KNOB}
     private PossibleAction[]possibleActions;
     private Random random;
+
 
 
     private class PossibleAction{
         public String name;
         public String[] states;
-        public actionTypes actionType;
-        public PossibleAction(String name, String[] states, actionTypes actionType){
+        public BoatActionControlType actionType;
+
+        public PossibleAction(String name, String[] states, BoatActionControlType actionType){
             this.name = name;
             this.states = states;
             this.actionType = actionType;
@@ -30,16 +31,16 @@ public class ActionCreator {
         random = new Random();
         possibleActions = new PossibleAction[6];
         String[] tempStates = {"release","capture"};
-        possibleActions[0] = new PossibleAction("Kraken", Arrays.copyOf(tempStates, tempStates.length), actionTypes.TOGGLE);
+        possibleActions[0] = new PossibleAction("Kraken", Arrays.copyOf(tempStates, tempStates.length), BoatActionControlType.TOGGLE);
 
         String[] tempStates2 = {"unload","load"};
-        possibleActions[1] = new PossibleAction("Cannons",  Arrays.copyOf(tempStates2, tempStates2.length), actionTypes.TOGGLE);
+        possibleActions[1] = new PossibleAction("Cannons",  Arrays.copyOf(tempStates2, tempStates2.length), BoatActionControlType.TOGGLE);
 
        String[] tempStates3 = {"raise","lower"};
-        possibleActions[2] = new PossibleAction("Jolly Rodger",  Arrays.copyOf(tempStates3, tempStates3.length), actionTypes.TOGGLE);
+        possibleActions[2] = new PossibleAction("Jolly Rodger",  Arrays.copyOf(tempStates3, tempStates3.length), BoatActionControlType.TOGGLE);
 
         String[] tempStates4 = {"down","ready","up"};
-        possibleActions[3] = new PossibleAction("Rudder",  Arrays.copyOf(tempStates4, tempStates4.length), actionTypes.TOGGLE);
+        possibleActions[3] = new PossibleAction("Rudder",  Arrays.copyOf(tempStates4, tempStates4.length), BoatActionControlType.SLIDER);
 //
 //        String[] tempStates5 = {"unfurl", "furl"};
 //        possibleActions[4] =new PossibleAction("Sails",  Arrays.copyOf(tempStates5, tempStates5.length), actionTypes.TOGGLE);
@@ -54,11 +55,11 @@ public class ActionCreator {
 //        possibleActions[7] =new PossibleAction("ERRing",Arrays.copyOf(tempStates8, tempStates8.length), actionTypes.TOGGLE);
 
         String[] tempStates9 = {"quarter mast", "half mast", "full-mast"};
-        possibleActions[4] =new PossibleAction("Sails",  Arrays.copyOf(tempStates9, tempStates9.length), actionTypes.TOGGLE);
+        possibleActions[4] =new PossibleAction("Sails",  Arrays.copyOf(tempStates9, tempStates9.length), BoatActionControlType.SLIDER);
 
 
         String[] tempStates5 = {"North", "East", "South", "West"};
-        possibleActions[5] =new PossibleAction("Direction",  Arrays.copyOf(tempStates5, tempStates5.length), actionTypes.TOGGLE);
+        possibleActions[5] =new PossibleAction("Direction",  Arrays.copyOf(tempStates5, tempStates5.length), BoatActionControlType.SLIDER);
 
 
 
@@ -104,7 +105,7 @@ public class ActionCreator {
             position = roleAPosition();
             if(position != -1) {
 
-                chosenBoatActions.add(createRandomUninishedAction(position));
+                chosenBoatActions.add(createRandomUnfinishedAction(position));
                 iOverallPosition++;
             }
         }
@@ -125,35 +126,35 @@ public class ActionCreator {
         PossibleAction possibleAction = possibleActions[position];
 
         String actionRef = possibleAction.actionType.name() + possibleAction.name;
-        BoatAction action = new BoatAction(possibleAction.name, 0, 0, actionRef, possibleAction.states);
+        BoatAction action = new BoatAction(possibleAction.name, possibleAction.actionType, 0, 0, actionRef, possibleAction.states);
         return action;
     }
 
 
-    private BoatAction createRandomUninishedAction(int position){
+    private BoatAction createRandomUnfinishedAction(int position){
         BoatAction boatAction;
         PossibleAction possibleAction = possibleActions[position];
         String actionRef = possibleAction.actionType.name() + possibleAction.name;
         int roll = random.nextInt(10);
 
         if(roll > 5){
-            boatAction= new BoatAction(possibleAction.name, 0, 1, actionRef, possibleAction.states);
+            boatAction= new BoatAction(possibleAction.name, possibleAction.actionType,0, 1, actionRef, possibleAction.states);
         }
         else{
-            boatAction= new BoatAction(possibleAction.name, 1, 0, actionRef, possibleAction.states);
+            boatAction= new BoatAction(possibleAction.name, possibleAction.actionType, 1, 0, actionRef, possibleAction.states);
         }
 
         return boatAction;
     }
 
-    public BoatAction createAction(String actionName, int target, int current, String onActionState, String offActionState){
-        String[] tempStates = {onActionState,offActionState};
-        return new BoatAction(actionName, target, current, "0", Arrays.copyOf(tempStates, tempStates.length));
-    }
-
-    public BoatAction createAction(String actionName, int target, int current, String[] states){
-        return new BoatAction(actionName, target, current, "0", Arrays.copyOf(states, states.length));
-    }
+//    public BoatAction createAction(String actionName,BoatActionControlType, int target, int current, String onActionState, String offActionState){
+//        String[] tempStates = {onActionState,offActionState};
+//        return new BoatAction(actionName, possibleAction.actionType, target, current, "0", Arrays.copyOf(tempStates, tempStates.length));
+//    }
+//
+//    public BoatAction createAction(String actionName, int target, int current, String[] states){
+//        return new BoatAction(actionName, target, current, "0", Arrays.copyOf(states, states.length));
+//    }
 
 
 
