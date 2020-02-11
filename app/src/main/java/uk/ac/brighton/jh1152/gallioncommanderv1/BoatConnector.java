@@ -69,7 +69,7 @@ public class BoatConnector {
         db = FirebaseFirestore.getInstance();
         instructionManager = new InstructionManager();
 
-        actionCreator = new ActionCreator();
+        actionCreator = new ActionCreator(activity); //temp
         ProgressBar progressBar = activity.findViewById(R.id.instruction_progress_bar);
         TextView instructionText = activity.findViewById(R.id.instruction_text);
         testCreateDialogue();

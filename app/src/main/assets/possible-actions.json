@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Kraken",
+    "type": "KNOB",
+    "states": ["release", "capture"]
+  },
+  {
+    "name": "Direction",
+    "type": "KNOB",
+    "states": ["north","east", "south","west"]
+  },
+  {
+    "name": "Cannons",
+    "type": "KNOB",
+    "states": ["load", "unload"]
+  },
+  {
+    "name": "Jolly Rodger",
+    "type": "KNOB",
+    "states": ["raise", "lower"]
+  },
+  {
+    "name": "Rudder",
+    "type": "KNOB",
+    "states": ["up", "down"]
+  },
+  {
+    "name": "Rum",
+    "type": "KNOB",
+    "states": ["stow", "get out", "drink"]
+  }
+]

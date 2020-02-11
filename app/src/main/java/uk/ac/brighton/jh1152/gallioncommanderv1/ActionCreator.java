@@ -1,17 +1,21 @@
 package uk.ac.brighton.jh1152.gallioncommanderv1;
 
+import android.app.Activity;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 public class ActionCreator {
-
-    private enum actionControlType {TOGGLE, SLIDER, KNOB}
     private PossibleAction[]possibleActions;
     private Random random;
-
+    private Activity activity; //temp
 
 
     private class PossibleAction{
@@ -27,20 +31,22 @@ public class ActionCreator {
     }
 
 
-    public ActionCreator(){
+    public ActionCreator(Activity activity){
+        this.activity = activity; //temp
         random = new Random();
-        possibleActions = new PossibleAction[6];
-        String[] tempStates = {"release","capture"};
-        possibleActions[0] = new PossibleAction("Kraken", Arrays.copyOf(tempStates, tempStates.length), BoatActionControlType.TOGGLE);
-
-        String[] tempStates2 = {"unload","load"};
-        possibleActions[1] = new PossibleAction("Cannons",  Arrays.copyOf(tempStates2, tempStates2.length), BoatActionControlType.TOGGLE);
-
-       String[] tempStates3 = {"raise","lower"};
-        possibleActions[2] = new PossibleAction("Jolly Rodger",  Arrays.copyOf(tempStates3, tempStates3.length), BoatActionControlType.TOGGLE);
-
-        String[] tempStates4 = {"down","ready","up"};
-        possibleActions[3] = new PossibleAction("Rudder",  Arrays.copyOf(tempStates4, tempStates4.length), BoatActionControlType.SLIDER);
+        buildPossibleActions();
+//        possibleActions = new PossibleAction[6];
+//        String[] tempStates = {"release","capture"};
+//        possibleActions[0] = new PossibleAction("Kraken", Arrays.copyOf(tempStates, tempStates.length), BoatActionControlType.TOGGLE);
+//
+//        String[] tempStates2 = {"unload","load"};
+//        possibleActions[1] = new PossibleAction("Cannons",  Arrays.copyOf(tempStates2, tempStates2.length), BoatActionControlType.TOGGLE);
+//
+//       String[] tempStates3 = {"raise","lower"};
+//        possibleActions[2] = new PossibleAction("Jolly Rodger",  Arrays.copyOf(tempStates3, tempStates3.length), BoatActionControlType.TOGGLE);
+//
+//        String[] tempStates4 = {"down","ready","up"};
+//        possibleActions[3] = new PossibleAction("Rudder",  Arrays.copyOf(tempStates4, tempStates4.length), BoatActionControlType.SLIDER);
 //
 //        String[] tempStates5 = {"unfurl", "furl"};
 //        possibleActions[4] =new PossibleAction("Sails",  Arrays.copyOf(tempStates5, tempStates5.length), actionTypes.TOGGLE);
@@ -54,14 +60,14 @@ public class ActionCreator {
 //        String[] tempStates8 = {"start", "stop"};
 //        possibleActions[7] =new PossibleAction("ERRing",Arrays.copyOf(tempStates8, tempStates8.length), actionTypes.TOGGLE);
 
-        String[] tempStates9 = {"quarter mast", "half mast", "full-mast"};
-        possibleActions[4] =new PossibleAction("Sails",  Arrays.copyOf(tempStates9, tempStates9.length), BoatActionControlType.SLIDER);
-
-
-        String[] tempStates5 = {"North", "East", "South", "West"};
-        possibleActions[5] =new PossibleAction("Direction",  Arrays.copyOf(tempStates5, tempStates5.length), BoatActionControlType.SLIDER);
-
-
+//        String[] tempStates9 = {"quarter mast", "half mast", "full-mast"};
+//        possibleActions[4] =new PossibleAction("Sails",  Arrays.copyOf(tempStates9, tempStates9.length), BoatActionControlType.SLIDER);
+//
+//
+//        String[] tempStates5 = {"North", "East", "South", "West"};
+//        possibleActions[5] =new PossibleAction("Direction",  Arrays.copyOf(tempStates5, tempStates5.length), BoatActionControlType.SLIDER);
+//
+//
 
 //        String[] tempStates10 = {"Avast", "Back to duties"};
 //        possibleActions[9] =new PossibleAction("Me harties", Arrays.copyOf(tempStates10, tempStates10.length), actionTypes.TOGGLE);
@@ -83,6 +89,47 @@ public class ActionCreator {
 //        possibleActions[14] =new PossibleAction("Fishing", Arrays.copyOf(tempStates15, tempStates15.length), actionTypes.TOGGLE);
 
     }
+
+
+// https://stackoverflow.com/questions/19945411/android-java-how-can-i-parse-a-local-json-file-from-assets-folder-into-a-listvi/19945484#19945484
+// https://stackoverflow.com/questions/40565078/how-to-add-json-file-to-android-project
+    private String getPossibleActionsFromFile(){
+        String possibleActionsString = null;
+        try {
+            InputStream inputStream = activity.getAssets().open("possible-actions.json");
+            int streamSize = inputStream.available();
+            byte[] buffer = new byte[streamSize];
+            inputStream.read(buffer);
+            inputStream.close();
+            possibleActionsString = new String(buffer, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return  possibleActionsString;
+    }
+
+    private void buildPossibleActions(){
+        try {
+            JSONArray jsonArray = new JSONArray(getPossibleActionsFromFile());
+            possibleActions = new PossibleAction[jsonArray.length()];
+            for(int i = 0; i < jsonArray.length(); i++){
+                JSONObject object = jsonArray.getJSONObject(i);
+                JSONArray JSONstates = object.getJSONArray("states");
+                String[] states = new String[JSONstates.length()];
+                for(int statesi = 0; statesi < JSONstates.length(); statesi++){
+                    states[statesi] = JSONstates.getString(statesi);
+                }
+                String name = object.getString("name");
+                String type = object.getString("type");
+                BoatActionControlType controlType = BoatActionControlType.valueOf(type);
+                possibleActions[i] = new PossibleAction(name,states, controlType);
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public BoatAction[] getRandomActions(int finishedAmnt, int notFinishedAmnt){
         ArrayList<BoatAction> chosenBoatActions = new ArrayList<>();

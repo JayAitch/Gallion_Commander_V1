@@ -45,8 +45,6 @@ public class MainGameActivity extends AppCompatActivity {
         boatConnector.formBoatFromDocument(gameID);
     }
 
-
-
     public void addActionButton(BoatAction action){
         IBaseBoatActionUI newUIAction;
 

@@ -69,7 +69,7 @@ public class LobbyActivity extends AppCompatActivity {
         startGameBtn = (Button) findViewById(R.id.start_game_button);
         db = FirebaseFirestore.getInstance();
         lobbyDocument = db.collection("games").document(lobbyID);
-        actionCreator = new ActionCreator();
+        actionCreator = new ActionCreator(this);
 
         startGameBtn.setOnClickListener(new View.OnClickListener() {
             @Override
