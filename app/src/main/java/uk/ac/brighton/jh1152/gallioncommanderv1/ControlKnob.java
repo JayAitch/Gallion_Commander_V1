@@ -68,11 +68,15 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
 
     private void drawerTextAt(Canvas canvas,Point pos, String text){
         Paint paint = new Paint();
-        paint.setTextSize(48);
+        paint.setTextSize(32);
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.FILL);
         paint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText(text, pos.x, pos.y, paint);
+
+        int xPos = pos.x + (int)(paint.measureText(text,0,text.length())/2) + (int)(paint.getTextSize()/2);
+        int yPos = (int)(pos.y  + Math.abs(paint.ascent() + Math.abs(paint.descent())) + paint.getTextSize());
+
+        canvas.drawText(text, xPos, yPos, paint);
         Log.d("new lavel", "at x:"+pos.x+"y:"+pos.y+text);
     }
 
@@ -92,17 +96,17 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
         controlKnob.setRotation(angle);
     }
 
-
+// thios doesnt work in layout
 
     private Point getStatePosition(int stateValue) {
 
 
-        float radius = (controlKnob.getWidth() / 2) - 20;
+        float radius = (controlKnob.getWidth() / 2);
         Double startAngle = Math.PI * (9 / 2d);
         Double angle =  startAngle + (stateValue * ( (2 * Math.PI) / stateNames.length));
 
         float xOrigin = controlKnob.getX() + (controlKnob.getWidth() / 2);
-        float yOrigin = controlKnob.getY() + (controlKnob.getHeight() / 2) + 20;
+        float yOrigin = controlKnob.getY() + (controlKnob.getHeight() / 2);
 
         int posX  = (int) ((radius * Math.cos(angle)) + xOrigin);
         int posY  = (int) ((radius * Math.sin(angle)) + yOrigin);
