@@ -51,11 +51,7 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
         setCurrentValue(currentValue);
     }
 
-    private void drawAllLabels(){
-        for(int stateLabelsInc = 0; stateLabelsInc < stateNames.length; stateLabelsInc++){
-        //    drawerTextAt(getStatePosition(stateLabelsInc), stateNames[stateLabelsInc]);
-        }
-}
+
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
@@ -77,7 +73,11 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
         paint.setTextAlign(Paint.Align.CENTER);
 
         int xPos = pos.x + (int)(paint.measureText(text,0,text.length())/2) + (int)(paint.getTextSize()/2);
-        int yPos = (int)(pos.y  + Math.abs(paint.ascent() + Math.abs(paint.descent())) + paint.getTextSize()/2);
+//        //int yPos = (int)(pos.y  + Math.abs(paint.ascent()/2 + Math.abs(paint.descent()/2)) + paint.getTextSize()/2);
+        int yPos = (int)(pos.y  + Math.pow(Math.abs((2 * paint.ascent())) + (2 * Math.abs(paint.descent())), 0.5) + paint.getTextSize()*1.5);
+//        int xPos = pos.x;
+//        int yPos = pos.y;
+
         canvas.drawText(text, xPos, yPos, paint);
 
     }
@@ -88,8 +88,6 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
         //stateText = (TextView) findViewById(R.id.stateText);
         controlKnob =(ImageView) findViewById(R.id.control_knob);
         nameText.setText(name);
-        drawAllLabels();
-
     }
 
     private void setRotation(int currentValue){
@@ -99,11 +97,13 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
     }
 
 // thios doesnt work in layout
-
+    //https://gamedev.stackexchange.com/questions/9607/moving-an-object-in-a-circular-path
     private Point getStatePosition(int stateValue) {
 
+        float offset = 32;
 
-        float radius = (controlKnob.getWidth() / 2);
+        //float radius = (360 / 2) + offset;
+        float radius = (controlKnob.getHeight() / 2) + offset;
         Double startAngle = Math.PI * (9 / 2d);
         Double angle =  startAngle + (stateValue * ( (2 * Math.PI) / stateNames.length));
 
@@ -116,7 +116,7 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
     }
 
 
-    //https://gamedev.stackexchange.com/questions/9607/moving-an-object-in-a-circular-path
+    //
 //
 //    private Point getStatePosition(int stateValue){
 //

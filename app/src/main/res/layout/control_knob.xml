@@ -21,8 +21,7 @@
         android:id="@+id/control_knob"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="62dp"
-        android:layout_weight="1"
+        android:layout_margin="34dp"
         app:srcCompat="@drawable/test_knob" />
 
 

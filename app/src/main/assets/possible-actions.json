@@ -14,7 +14,7 @@
 
   {
     "name": "Rum",
-    "type": "SLIDER",
+    "type": "KNOB",
     "states": ["stow", "get out", "drink"]
   },
   {
