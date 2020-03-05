@@ -100,10 +100,11 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
     //https://gamedev.stackexchange.com/questions/9607/moving-an-object-in-a-circular-path
     private Point getStatePosition(int stateValue) {
 
-        float offset = 32;
+        float offset = 22;
 
         //float radius = (360 / 2) + offset;
-        float radius = (controlKnob.getHeight() / 2) + offset;
+        double rough = Math.pow(controlKnob.getHeight() * controlKnob.getWidth(), 0.5);
+        float radius = (float)(rough / 2) + offset;
         Double startAngle = Math.PI * (9 / 2d);
         Double angle =  startAngle + (stateValue * ( (2 * Math.PI) / stateNames.length));
 
