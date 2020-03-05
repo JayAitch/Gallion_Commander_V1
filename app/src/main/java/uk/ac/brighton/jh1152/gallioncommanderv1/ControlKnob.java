@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 
 public class ControlKnob extends LinearLayout implements ICustomControl {
 
@@ -67,13 +69,15 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
 
     private void drawerTextAt(Canvas canvas,Point pos, String text){
         Paint paint = new Paint();
+        Typeface typeface = ResourcesCompat.getFont(getContext(),R.font.anton);
         paint.setTextSize(32);
+        paint.setTypeface(typeface);
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.FILL);
         paint.setTextAlign(Paint.Align.CENTER);
 
         int xPos = pos.x + (int)(paint.measureText(text,0,text.length())/2) + (int)(paint.getTextSize()/2);
-        int yPos = (int)(pos.y  + Math.abs(paint.ascent() + Math.abs(paint.descent())) + paint.getTextSize());
+        int yPos = (int)(pos.y  + Math.abs(paint.ascent() + Math.abs(paint.descent())) + paint.getTextSize()/2);
         canvas.drawText(text, xPos, yPos, paint);
 
     }
