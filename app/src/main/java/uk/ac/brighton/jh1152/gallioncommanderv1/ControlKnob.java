@@ -3,9 +3,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Point;
-import android.text.StaticLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,9 +15,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.core.view.MotionEventCompat;
-
-import java.util.Map;
 
 public class ControlKnob extends LinearLayout implements ICustomControl {
 
@@ -27,6 +22,7 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
     TextView nameText;
     String name;
     String[] stateNames;
+    Point[] stateLabelPos;
     int currentValue;
     float angleOffset = 45;
 
@@ -48,6 +44,7 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
         this.name = name;
         this.stateNames = stateNames;
         this.currentValue = currentValue;
+        stateLabelPos = new Point[stateNames.length];
         createViewObjects();
         setCurrentValue(currentValue);
     }
@@ -62,7 +59,9 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
         for(int stateLabelsInc = 0; stateLabelsInc < stateNames.length; stateLabelsInc++){
-            drawerTextAt(canvas, getStatePosition(stateLabelsInc), stateNames[stateLabelsInc]);
+            Point newPosition = getStatePosition(stateLabelsInc);
+            drawerTextAt(canvas, newPosition, stateNames[stateLabelsInc]);
+            stateLabelPos[stateLabelsInc] = newPosition;
         }
     }
 
@@ -75,9 +74,8 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
 
         int xPos = pos.x + (int)(paint.measureText(text,0,text.length())/2) + (int)(paint.getTextSize()/2);
         int yPos = (int)(pos.y  + Math.abs(paint.ascent() + Math.abs(paint.descent())) + paint.getTextSize());
-
         canvas.drawText(text, xPos, yPos, paint);
-        Log.d("new lavel", "at x:"+pos.x+"y:"+pos.y+text);
+
     }
 
     private void createViewObjects(){
@@ -168,7 +166,30 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
         setRotation(statePosition);
     }
 
+    public int cloestPoint(Point location){
 
+        double closetDistance = 10000;
+        int closetPoint = 0;
+        int incrementor = 0;
+        for(Point point : stateLabelPos){
+            double distanceBetween = distance(location, point);
+            Log.d("new distances", "<<<<<" + distanceBetween);
+            if(distanceBetween < closetDistance){
+                closetDistance = distanceBetween;
+                closetPoint = incrementor;
+            }
+
+            incrementor++;
+        }
+        return closetPoint;
+    }
+
+
+//https://stackoverflow.com/questions/11534323/android-distance-between-two-points
+    private double distance(Point a, Point b){
+        double distance = Math.sqrt(Math.pow(a.x - b.x,2) + Math.pow(a.y - b.y, 2));
+        return distance;
+    }
 //    @Override
 //    public boolean onTouchEvent(MotionEvent event) {
 //
@@ -230,17 +251,40 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
 
 
     @Override
-    public void setControlListener(IControlListener controlListener) {
+    public void setControlListener(final IControlListener controlListener) {
         this.setOnTouchListener(new OnTouchListener() {
             @Override
              public boolean onTouch(View v, MotionEvent event) {
                 int action = event.getAction();
+                Point contact = new Point((int)event.getX(), (int)event.getY());
+                int closestState = cloestPoint(contact);
+                Log.d("<<<<<<<<", "state chosen" +closestState);
+                Log.d("<<<<<<<<", "state chosen" +closestState);
+                setCurrentValue(closestState);
+                controlListener.onControlChange(closestState);
+                controlListener.onControlStopTouch();
         switch (action) {
             case (MotionEvent.ACTION_DOWN):
 
                 return true;
             case (MotionEvent.ACTION_MOVE):
-
+//                int historySize = event.getHistorySize();
+//                float xd = 0;
+//                float yd = 0;
+//                float td = 0;
+//                //float speed = 10;
+//
+//                if(historySize > 0) {
+//                    xd = event.getX() - event.getHistoricalX(historySize - 1);
+//                    yd = (event.getY() - event.getHistoricalY(historySize - 1)) * -1;
+//                    td = xd + yd;
+//                }
+//                rotateKnob(td);
+//                Point contact = new Point((int)event.getX(), (int)event.getY());
+//                int closestState = cloestPoint(contact);
+//                Log.d("<<<<<<<<", "state chosen" +closestState);
+//                Log.d("<<<<<<<<", "state chosen" +closestState);
+//                setCurrentValue(closestState);
                 return true;
             case (MotionEvent.ACTION_UP):
                 return true;

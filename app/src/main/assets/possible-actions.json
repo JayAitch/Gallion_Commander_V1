@@ -1,8 +1,36 @@
 [
   {
     "name": "Kraken",
-    "type": "KNOB",
+    "type": "TOGGLE",
     "states": ["release", "capture"]
+  },
+
+  {
+    "name": "Rudder",
+    "type": "TOGGLE",
+    "states": ["up", "down"]
+  },
+
+
+  {
+    "name": "Rum",
+    "type": "SLIDER",
+    "states": ["stow", "get out", "drink"]
+  },
+  {
+    "name": "Deck",
+    "type": "SLIDER",
+    "states": ["swab", "clear", "board"]
+  },
+  {
+    "name": "Cannons",
+    "type": "TOGGLE",
+    "states": ["load", "unload"]
+  },
+  {
+    "name": "Jolly Rodger",
+    "type": "TOGGLE",
+    "states": ["raise", "lower"]
   },
   {
     "name": "Direction",
@@ -10,23 +38,8 @@
     "states": ["north","east", "south","west"]
   },
   {
-    "name": "Cannons",
-    "type": "KNOB",
-    "states": ["load", "unload"]
-  },
-  {
-    "name": "Jolly Rodger",
-    "type": "KNOB",
-    "states": ["raise", "lower"]
-  },
-  {
-    "name": "Rudder",
-    "type": "KNOB",
-    "states": ["up", "down"]
-  },
-  {
-    "name": "Rum",
-    "type": "KNOB",
-    "states": ["stow", "get out", "drink"]
+    "name": "Other Vessel",
+    "type": "TOGGLE",
+    "states": ["board","return from"]
   }
 ]

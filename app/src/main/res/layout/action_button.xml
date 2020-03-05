@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="@dimen/action_card_margin"
-    android:background="#86DDA38C"
+    android:background="@color/panelBackground"
     android:orientation="horizontal"
     android:padding="@dimen/action_text_padding">
 
@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/action_text_padding"
         android:text="TextView"
+        android:textAppearance="@style/UIHeaderText"
         android:textSize="@dimen/action_name_text" />
 
     <Button
@@ -20,7 +21,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:text="Button" />
+        android:background="@color/colorPrimary"
+        android:text="Button"
+        android:textAppearance="@style/UIButtonText" />
 
 
 </LinearLayout>
