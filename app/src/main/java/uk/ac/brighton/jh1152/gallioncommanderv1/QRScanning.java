@@ -43,7 +43,7 @@ public class QRScanning extends AppCompatActivity implements ZXingScannerView.Re
     private void launchLobbyActivity(String documentID){
         Intent intent = new Intent(this, LobbyActivity.class);
         String boatIdMessage = documentID;
-        intent.putExtra(LandingActivity.EXTRA_LOBBY_ID, boatIdMessage);
+        intent.putExtra(ActivityExtras.EXTRA_LOBBY_ID, boatIdMessage);
         startActivity(intent);
     }
 

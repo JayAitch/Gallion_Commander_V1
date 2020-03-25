@@ -50,8 +50,7 @@ public class LobbyActivity extends AppCompatActivity {
     Map<String, Object> lobbyData;
     ActionCreator actionCreator;
     int thisPlayerNumber;
-    public static final String EXTRA_BOAT_ID = "uk.ac.brighton.jh1152.gallioncommanderv1.BOATID";
-    public static final String EXTRA_PLAYER_NUMBER = "uk.ac.brighton.jh1152.gallioncommanderv1.PLAYERNUMBER";
+
 
 
     @Override
@@ -59,7 +58,7 @@ public class LobbyActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        lobbyID = intent.getStringExtra(LandingActivity.EXTRA_LOBBY_ID);
+        lobbyID = intent.getStringExtra(ActivityExtras.EXTRA_LOBBY_ID);
 
         setContentView(R.layout.lobby_layout);
         lobbyCodeText = (TextView) findViewById(R.id.lobbyIDText);
@@ -132,8 +131,8 @@ public class LobbyActivity extends AppCompatActivity {
     private void launchGame(String boatID){
         Intent intent = new Intent(this, MainGameActivity.class);
         String boatIdMessage = boatID;
-        intent.putExtra(EXTRA_BOAT_ID, boatIdMessage);
-        intent.putExtra(EXTRA_PLAYER_NUMBER, thisPlayerNumber);
+        intent.putExtra(ActivityExtras.EXTRA_BOAT_ID, boatIdMessage);
+        intent.putExtra(ActivityExtras.EXTRA_PLAYER_NUMBER, thisPlayerNumber);
         startActivity(intent);
     }
 
@@ -142,6 +141,7 @@ public class LobbyActivity extends AppCompatActivity {
     private void disconnectFromLobby(){
         lobbyData.put("players", FieldValue.increment(-1));
         lobbyDocument.update(lobbyData);
+        lobbyListener.remove();
     }
 
     @Override
@@ -154,6 +154,12 @@ public class LobbyActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         connnectToLobby();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disconnectFromLobby();
     }
 
     private BoatAction[] createBoatActionsCollection(){

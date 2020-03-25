@@ -10,25 +10,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 
-public class BoatActionMultiState implements IBaseBoatActionUI {
+public class UIActionController implements IBaseBoatActionUI {
 
     int currentValue;
     Boat lBoat;
     BoatAction action;
-    ControlSeekBarWithText seekbarWithText; // make generic should be able to have any multivalue actio on here
-    ControlKnob testKnob; //temp
     ICustomControl control;
+
     //https://stackoverflow.com/questions/3671649/java-newinstance-of-class-that-has-no-default-constructor
-
-
-
-    private <T>T instantiateControl(Class<T> controlClass, Activity activity, BoatAction boatAction) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-            Constructor<T> constructor = controlClass.getConstructor(Context.class, String.class, String[].class, int.class);
-
-            return constructor.newInstance(activity, boatAction.actionName, boatAction.states, boatAction.actionCurrent);
-
-    }
-
     private ICustomControl instantiateControl(Activity activity, BoatAction boatAction) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
         Class controlClass = getActionClass(boatAction.controlType);
         Constructor constructor = controlClass.getConstructor(Context.class, String.class, String[].class, int.class);
@@ -54,7 +43,7 @@ public class BoatActionMultiState implements IBaseBoatActionUI {
 
 
 
-    public BoatActionMultiState(Activity activity, Boat boat, BoatAction boatAction) {
+    public UIActionController(Activity activity, Boat boat, BoatAction boatAction) {
         lBoat = boat;
         action = boatAction;
 
@@ -62,8 +51,7 @@ public class BoatActionMultiState implements IBaseBoatActionUI {
 
 
         try {
-
-            control = (ICustomControl) instantiateControl(getActionClass(boatAction.controlType), activity, boatAction);
+            control =  instantiateControl(activity, boatAction);
             layout.addView((LinearLayout)control);
             control.setControlListener(new IControlListener() {
                 @Override
@@ -102,7 +90,7 @@ public class BoatActionMultiState implements IBaseBoatActionUI {
     }
 
     @Override
-    public void valueChangeCallback() {
+    public void updateDisplay() {
         control.setCurrentValue(action.actionCurrent);
     }
 }

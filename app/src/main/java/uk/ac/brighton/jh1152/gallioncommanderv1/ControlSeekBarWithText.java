@@ -72,9 +72,5 @@ public class ControlSeekBarWithText extends LinearLayout implements  ICustomCont
             }
         });
     }
-/**
-    public void setOnSeekBarChangeListener(SeekBar.OnSeekBarChangeListener listener){
-        seekBar.setOnSeekBarChangeListener(listener);
-    }
-**/
+
 }

@@ -45,6 +45,8 @@ public class InstructionManager {
     private void addToInstructions(BoatAction action){
         boatInstructions.put(action.documentReference, action.getInstructionText());
     }
+
+
     public void clearInstructions(){
         boatInstructions.clear();
     }

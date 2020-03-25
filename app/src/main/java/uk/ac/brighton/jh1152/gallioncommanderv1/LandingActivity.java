@@ -3,6 +3,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -19,7 +20,7 @@ public class LandingActivity extends AppCompatActivity {
     Button hostBtn;
     Button joinBtn;
     FirebaseFirestore db;
-    public static final String EXTRA_LOBBY_ID = "uk.ac.brighton.jh1152.gallioncommanderv1.LOBBYID";
+
 
 
     @Override
@@ -103,7 +104,7 @@ public class LandingActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, LobbyActivity.class);
         String boatIdMessage = documentID;//"rJjFieQQOrE82iW0Wkio";//lobbyID;
-        intent.putExtra(EXTRA_LOBBY_ID, boatIdMessage);
+        intent.putExtra(ActivityExtras.EXTRA_LOBBY_ID, boatIdMessage);
         startActivity(intent);
     }
 

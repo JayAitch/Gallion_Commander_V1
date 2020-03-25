@@ -4,8 +4,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.CountDownTimer;
-import android.os.Debug;
-import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -26,9 +24,6 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.w3c.dom.Text;
-
-import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,7 +99,7 @@ public class BoatConnector {
                                     boatActions.put(document.getId(), tempAction);
                                     manageInstructionList(tempAction);
 
-                                    if(isShowingActivityToPlayer(activityPosition, activitiesSize)){
+                                    if(shouldShowActivityToPlayer(activityPosition, activitiesSize)){
                                         activity.addActionButton(tempAction);// temporary
                                     }
                                     activityPosition++;
@@ -146,11 +141,18 @@ public class BoatConnector {
         boatListener = boatDocument.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-
+                int lives = documentSnapshot.get("lives", int.class);
+                currentBoat.livesRemaining = lives;
+                activity.updateUI();
             }
         });
     }
 
+
+    public void destroyListeners(){
+        boatListener.remove();
+        collectionListener.remove();
+    }
 
 
     public int getActionsRemainingAmount(){
@@ -177,14 +179,14 @@ public class BoatConnector {
 
 
 
-    private boolean isShowingActivityToPlayer(int activityPosition, int activitiesSize){
+    private boolean shouldShowActivityToPlayer(int activityPosition, int activitiesSize){
         boolean isShowingToPlayer = false;
         float activitiesPerUser = activitiesSize / (float)playerAmnt;
         int activitiesMin = (int)Math.floor(activitiesPerUser * playerPosition);
-        int activitesMax = (int)Math.floor(activitiesMin + activitiesPerUser);
+        int activitiesMax = (int)Math.floor(activitiesMin + activitiesPerUser);
 
 
-        if(activityPosition <= activitesMax && activityPosition >= activitiesMin){
+        if(activityPosition <= activitiesMax && activityPosition >= activitiesMin){
             isShowingToPlayer = true;
         }
         return isShowingToPlayer;
@@ -198,7 +200,7 @@ public class BoatConnector {
         String controlType = document.get("type", String.class);
         List<String> states = (List<String>) document.get("states");
         String[] statesArray = states.toArray(new String[states.size()]);
-        BoatAction boatAction = new BoatAction(name,BoatActionControlType.valueOf(controlType), target, current, document.getId(), statesArray);
+        BoatAction boatAction = new BoatAction(name, BoatActionControlType.valueOf(controlType), target, current, document.getId(), statesArray);
         return boatAction;
     }
 
@@ -209,7 +211,7 @@ public class BoatConnector {
         manageInstructionList(currentBoat.actions.get(documentSnapshot.getId()));
         activity.updateUI();
 
-            // do this by listening to a value on the document
+        // do this by listening to a value on the document
        if(getBoatState() == boatState.COMPLETE){
             stopGame();
             testNewLevel();
@@ -227,11 +229,10 @@ public class BoatConnector {
 
 
     private void removeALife() {
-            Map<String, Object> boatData = currentBoat.getData();
-            boatData.put("lives", FieldValue.increment(-1));
-            activity.updateUI();
-            currentBoat.removeALife();
-            boatDocument.update(boatData);
+        Map<String, Object> boatData = currentBoat.getData();
+        boatData.put("lives", FieldValue.increment(-1));
+        currentBoat.removeALife();
+        boatDocument.update(boatData);
     }
 
 
@@ -266,16 +267,11 @@ public class BoatConnector {
 
 
     private void manageInstructionList(BoatAction action) {
-
-
-
-
             instructionManager.manageInstructionList(action);
             if (instructionManager.isCurrentInstruction(action.documentReference) && action.isActionComplete()) {
                 instructionManager.setRandomInstruction();
                 currentInstructionComplete();
             }
-
     }
 
 
@@ -394,7 +390,6 @@ public class BoatConnector {
     }
 
     private void triggerNewLevelLoad(){
-
 
         formBoatFromDocument(boatDocument.getId());
     }
