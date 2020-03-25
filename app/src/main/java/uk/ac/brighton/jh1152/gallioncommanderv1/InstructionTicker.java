@@ -10,7 +10,6 @@ public class InstructionTicker {
 
     TextView instructionText;
     ProgressBar progressBar;
-    String instructionString;
     BoatConnector boatConnector;
     BarTimer barTimer;
 
@@ -60,8 +59,6 @@ public class InstructionTicker {
 
         @Override
         public void onFinish() {
-
-            Log.d("ba finished", "<<<<<<<<<<<<<<<<<<<");
             barFinish();
         }
     }

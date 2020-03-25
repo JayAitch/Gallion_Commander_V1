@@ -92,32 +92,6 @@ public class BoatActionMultiState implements IBaseBoatActionUI {
             e.printStackTrace();
         }
 
-
-
-//temp
-
-
-//        testKnob = new ControlKnob(activity, action.actionName, action.states, action.actionCurrent);
-//        layout.addView(testKnob);
-//        testKnob.setControlListener(new IControlListener() {
-//            @Override
-//            public void onControlChange(int value) {
-//
-//            }
-//
-//            @Override
-//            public void onControlStopTouch() {
-//
-//            }
-//
-//            @Override
-//            public void onControlStartTouch() {
-//
-//            }
-//        });
-
-
-
     }
 
 
@@ -129,8 +103,6 @@ public class BoatActionMultiState implements IBaseBoatActionUI {
 
     @Override
     public void valueChangeCallback() {
-
         control.setCurrentValue(action.actionCurrent);
-//        testKnob.setCurrentValue(action.actionCurrent);
     }
 }
