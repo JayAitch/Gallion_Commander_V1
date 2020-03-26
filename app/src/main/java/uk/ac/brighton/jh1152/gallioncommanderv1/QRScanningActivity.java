@@ -5,7 +5,7 @@ import android.os.Bundle;
 import com.google.zxing.Result;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class QRScanning extends AppCompatActivity implements ZXingScannerView.ResultHandler{
+public class QRScanningActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler{
 
     private ZXingScannerView mScannerView;
     @Override

@@ -3,7 +3,6 @@ package uk.ac.brighton.jh1152.gallioncommanderv1;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -15,8 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentChange;
+import com.google.android.gms.tasks.Task;;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -24,21 +22,18 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.WriteBatch;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
-
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class LobbyActivity extends AppCompatActivity {
 
-    public String lobbyID ="rJjFieQQOrE82iW0Wkio";
+    String lobbyID;
     FirebaseFirestore db;
     TextView lobbySizeText;
     TextView lobbyPositionText;
@@ -50,6 +45,9 @@ public class LobbyActivity extends AppCompatActivity {
     Map<String, Object> lobbyData;
     ActionCreator actionCreator;
     int thisPlayerNumber;
+    String newBoatReferenceID;
+    BoatAction[] boatActions;
+    int boatActivityCount = 0;
 
 
 
@@ -169,9 +167,6 @@ public class LobbyActivity extends AppCompatActivity {
 
 
 
-    String newBoatReferenceID;
-    BoatAction[] boatActions;
-    int BoatActivtyCount= 0;
 
 
     private void createNewBoatAndSetReference(){
@@ -190,8 +185,8 @@ public class LobbyActivity extends AppCompatActivity {
                     db.collection("boats/"+ newBoatReferenceID +"/activities").document(action.documentReference).set(action.getDocumentValues()).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            BoatActivtyCount++;
-                            CheckIfFinishedCreatingActions(BoatActivtyCount);
+                            boatActivityCount++;
+                            checkIfFinishedCreatingActions(boatActivityCount);
                         }
                     });
                 }
@@ -219,12 +214,11 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
 
-    private void CheckIfFinishedCreatingActions(int activitesCount){
-        if(boatActions.length == activitesCount){
+    private void checkIfFinishedCreatingActions(int activitiesCount){
+        if(boatActions.length == activitiesCount){
             lobbyData.put("boat", newBoatReferenceID);
             lobbyDocument.update(lobbyData);
         }
-
     }
 
 

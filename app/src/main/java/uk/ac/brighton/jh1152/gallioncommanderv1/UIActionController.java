@@ -2,15 +2,13 @@ package uk.ac.brighton.jh1152.gallioncommanderv1;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 
-public class UIActionController implements IBaseBoatActionUI {
+public class UIActionController {
 
     int currentValue;
     Boat lBoat;
@@ -62,7 +60,7 @@ public class UIActionController implements IBaseBoatActionUI {
 
                 @Override
                 public void onControlStopTouch() {
-                    SetBoatAction();
+                    setBoatAction();
                 }
 
                 @Override
@@ -83,13 +81,12 @@ public class UIActionController implements IBaseBoatActionUI {
     }
 
 
-    @Override
-    public Boolean SetBoatAction() {
+    public Boolean setBoatAction() {
         lBoat.setActionValue(action.documentReference, currentValue);
         return null;
     }
 
-    @Override
+
     public void updateDisplay() {
         control.setCurrentValue(action.actionCurrent);
     }

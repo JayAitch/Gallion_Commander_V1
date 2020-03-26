@@ -13,8 +13,7 @@ public class Boat {
     public HashMap<String, BoatAction> actions;
     private String docRef; //temp
     public int livesRemaining;
-
-    private FirebaseFirestore db; // probably not here
+    private FirebaseFirestore db;
 
     public Boat(HashMap<String,BoatAction> actions , String documentReference, int livesRemaining){
         this.livesRemaining = livesRemaining;

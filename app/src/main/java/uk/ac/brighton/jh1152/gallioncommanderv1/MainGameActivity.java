@@ -17,9 +17,7 @@ public class MainGameActivity extends AppCompatActivity {
     String gameID;
     int playerNumber;
 
-    HashMap<String, IBaseBoatActionUI> boatActionButtons;
-
-    TextView instructionTextDisplay;
+    HashMap<String, UIActionController> boatActionButtons;
     TextView livesLeftText;
     TextView actionsRemainingText;
 
@@ -33,14 +31,13 @@ public class MainGameActivity extends AppCompatActivity {
         gameID = intent.getStringExtra(ActivityExtras.EXTRA_BOAT_ID);
         playerNumber = intent.getIntExtra(ActivityExtras.EXTRA_PLAYER_NUMBER, -1);
         setContentView(R.layout.game_layout);
-        instructionTextDisplay = (TextView) findViewById(R.id.instruction_text);
         livesLeftText = findViewById(R.id.lives_remaining_text);
         actionsRemainingText = findViewById(R.id.instructions_size_text);
         initBoat();
     }
 
     public void addActionButton(BoatAction action){
-        IBaseBoatActionUI newUIAction = new UIActionController(this, boatConnector.currentBoat, action);
+        UIActionController newUIAction = new UIActionController(this, boatConnector.currentBoat, action);
         boatActionButtons.put(action.documentReference, newUIAction);
     }
 
@@ -58,8 +55,8 @@ public class MainGameActivity extends AppCompatActivity {
 
     public void updateUI(){
 
-        for (Map.Entry<String, IBaseBoatActionUI> entry: boatActionButtons.entrySet()) {
-            IBaseBoatActionUI UIAction = entry.getValue();
+        for (Map.Entry<String, UIActionController> entry: boatActionButtons.entrySet()) {
+            UIActionController UIAction = entry.getValue();
             UIAction.updateDisplay();
         }
 
@@ -67,11 +64,11 @@ public class MainGameActivity extends AppCompatActivity {
         displayLivesLeft();
     }
 
-    public void displayActionsLeft(){
+    private void displayActionsLeft(){
         actionsRemainingText.setText( Integer.toString(boatConnector.getActionsRemainingAmount()));
     }
 
-    public void displayLivesLeft(){
+    private void displayLivesLeft(){
         livesLeftText.setText(Integer.toString(boatConnector.currentBoat.livesRemaining));
     }
 

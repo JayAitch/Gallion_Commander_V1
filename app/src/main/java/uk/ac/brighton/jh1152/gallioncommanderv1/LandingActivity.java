@@ -3,7 +3,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -83,7 +82,7 @@ public class LandingActivity extends AppCompatActivity {
 
 
     private void launchScanningActivity(){
-        Intent intent = new Intent(this, QRScanning.class);
+        Intent intent = new Intent(this, QRScanningActivity.class);
         startActivity(intent);
     }
 
@@ -103,7 +102,7 @@ public class LandingActivity extends AppCompatActivity {
     private void launchLobbyActivity(String documentID){
 
         Intent intent = new Intent(this, LobbyActivity.class);
-        String boatIdMessage = documentID;//"rJjFieQQOrE82iW0Wkio";//lobbyID;
+        String boatIdMessage = documentID;
         intent.putExtra(ActivityExtras.EXTRA_LOBBY_ID, boatIdMessage);
         startActivity(intent);
     }
