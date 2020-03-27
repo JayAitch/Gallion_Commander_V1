@@ -14,7 +14,7 @@ import java.util.Random;
 public class ActionCreator {
     private PossibleAction[]possibleActions;
     private Random random;
-    private Activity activity; //temp
+    private Activity activity;
 
 
     private class PossibleAction{

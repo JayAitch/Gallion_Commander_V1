@@ -11,9 +11,9 @@ import java.lang.reflect.InvocationTargetException;
 public class UIActionController {
 
     int currentValue;
-    Boat lBoat;
-    BoatAction action;
-    ICustomControl control;
+    Boat mBoat;
+    BoatAction mAction;
+    ICustomControl mControl;
 
     //https://stackoverflow.com/questions/3671649/java-newinstance-of-class-that-has-no-default-constructor
     private ICustomControl instantiateControl(Activity activity, BoatAction boatAction) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
@@ -42,20 +42,20 @@ public class UIActionController {
 
 
     public UIActionController(Activity activity, Boat boat, BoatAction boatAction) {
-        lBoat = boat;
-        action = boatAction;
+        mBoat = boat;
+        mAction = boatAction;
 
         LinearLayout layout = (LinearLayout) activity.findViewById(R.id.activitiesGrid);
 
 
         try {
-            control =  instantiateControl(activity, boatAction);
-            layout.addView((LinearLayout)control);
-            control.setControlListener(new IControlListener() {
+            mControl =  instantiateControl(activity, boatAction);
+            layout.addView((LinearLayout) mControl);
+            mControl.setControlListener(new IControlListener() {
                 @Override
                 public void onControlChange(int value) {
                     currentValue = value;
-                    control.setCurrentValue(currentValue);
+                    mControl.setCurrentValue(currentValue);
                 }
 
                 @Override
@@ -81,13 +81,13 @@ public class UIActionController {
     }
 
 
-    public Boolean setBoatAction() {
-        lBoat.setActionValue(action.documentReference, currentValue);
-        return null;
+    public void setBoatAction() {
+        mBoat.setActionValue(mAction.documentReference, currentValue);
+
     }
 
 
     public void updateDisplay() {
-        control.setCurrentValue(action.actionCurrent);
+        mControl.setCurrentValue(mAction.actionCurrent);
     }
 }

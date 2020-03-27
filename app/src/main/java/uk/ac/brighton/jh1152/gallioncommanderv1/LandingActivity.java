@@ -90,7 +90,7 @@ public class LandingActivity extends AppCompatActivity {
     private void hostLobby(){
         Map<String, Object> newLobby = new HashMap<>();
         newLobby.put("players", 0);
-        db.collection("games").add(newLobby).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+        db.collection(DocumentLocations.LOBBY_COLLECTION).add(newLobby).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
             public void onSuccess(DocumentReference documentReference) {
                 launchLobbyActivity(documentReference.getId());

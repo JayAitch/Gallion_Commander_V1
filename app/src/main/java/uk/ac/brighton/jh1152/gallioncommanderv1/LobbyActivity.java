@@ -36,7 +36,6 @@ public class LobbyActivity extends AppCompatActivity {
     String lobbyID;
     FirebaseFirestore db;
     TextView lobbySizeText;
-    TextView lobbyPositionText;
     TextView lobbyCodeText;
     ImageView lobbyQRCode;
     Button startGameBtn;
@@ -60,12 +59,11 @@ public class LobbyActivity extends AppCompatActivity {
 
         setContentView(R.layout.lobby_layout);
         lobbyCodeText = (TextView) findViewById(R.id.lobbyIDText);
-        lobbyPositionText = (TextView) findViewById(R.id.lobbyPositionText);
         lobbySizeText = (TextView) findViewById(R.id.lobbySizeText);
         lobbyQRCode = (ImageView) findViewById(R.id.lobby_qr_code);
         startGameBtn = (Button) findViewById(R.id.start_game_button);
         db = FirebaseFirestore.getInstance();
-        lobbyDocument = db.collection("games").document(lobbyID);
+        lobbyDocument = db.collection(DocumentLocations.LOBBY_COLLECTION).document(lobbyID);
         actionCreator = new ActionCreator(this);
 
         startGameBtn.setOnClickListener(new View.OnClickListener() {
@@ -94,7 +92,6 @@ public class LobbyActivity extends AppCompatActivity {
                                 generateAndDisplayQRCode(document.getId());
                                 thisPlayerNumber = document.get("players", Integer.class);
 
-                                lobbyPositionText.setText(String.valueOf(thisPlayerNumber));
 
                             } else {
                                 lobbyCodeText.setText("failed to connect to lobby");
@@ -149,8 +146,8 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         connnectToLobby();
     }
 
@@ -166,9 +163,6 @@ public class LobbyActivity extends AppCompatActivity {
 
 
 
-
-
-
     private void createNewBoatAndSetReference(){
         Map<String, Object> newBoat = new HashMap<>();
         newBoat.put("lives", GameSettings.BASE_BOAT_LIVES);
@@ -179,10 +173,10 @@ public class LobbyActivity extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentReference documentReference) {
                 newBoatReferenceID = documentReference.getId();
-
+                String boatLocation = DocumentLocations.BOAT_COLLECTION + "/"+ newBoatReferenceID + "/" + DocumentLocations.ACTION_COLLECTION;
                 for(BoatAction action: boatActions){
 
-                    db.collection("boats/"+ newBoatReferenceID +"/activities").document(action.documentReference).set(action.getDocumentValues()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    db.collection(boatLocation).document(action.documentReference).set(action.getDocumentValues()).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             boatActivityCount++;

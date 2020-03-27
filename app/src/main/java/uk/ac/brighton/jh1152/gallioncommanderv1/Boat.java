@@ -45,12 +45,9 @@ public class Boat {
         return (livesRemaining > 0);
     }
 
-    public void removeALife(){
-        livesRemaining--;
-    }
 
     void setDocumentValue(BoatAction action){
-        db.collection("boats/" + docRef +"/activities")
+        db.collection(DocumentLocations.BOAT_COLLECTION + "/" + docRef +"/" + DocumentLocations.ACTION_COLLECTION)
                 .document(action.documentReference).update(action.getDocumentValues())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

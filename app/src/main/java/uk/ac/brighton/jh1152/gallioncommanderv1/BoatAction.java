@@ -13,7 +13,7 @@ public class BoatAction {
     String states[];
     BoatActionControlType controlType;
 
-    // reference will be the name
+
     public BoatAction(String name, BoatActionControlType type, int target, int current, String ref, String stateNames[]){
         actionName = name;
         actionTarget = target;

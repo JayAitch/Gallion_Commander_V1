@@ -74,30 +74,30 @@ public class MainGameActivity extends AppCompatActivity {
 
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initBoat();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        boatConnector.destroyListeners();
-    }
-
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        boatConnector.destroyListeners();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        boatConnector.destroyListeners();
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        initBoat();
+//    }
+//
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        boatConnector.destroyListeners();
+//    }
+//
+//
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        boatConnector.destroyListeners();
+//    }
+//
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        boatConnector.destroyListeners();
+//    }
 
     @Override
     public void onBackPressed() {
