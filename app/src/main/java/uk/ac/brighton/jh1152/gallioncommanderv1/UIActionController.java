@@ -45,7 +45,7 @@ public class UIActionController {
     public UIActionController(Activity activity, Boat boat, BoatAction boatAction) {
         mBoat = boat;
         mAction = boatAction;
-        // find the action clayout container
+          // find the action clayout container
         LinearLayout layout = (LinearLayout) activity.findViewById(R.id.activitiesGrid);
 
 

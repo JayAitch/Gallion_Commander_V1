@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="42dp"
-        app:srcCompat="@drawable/test_knob" />
+        app:srcCompat="@drawable/custom_knob" />
 
 
 </LinearLayout>

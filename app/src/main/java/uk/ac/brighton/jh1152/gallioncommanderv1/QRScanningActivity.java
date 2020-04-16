@@ -2,6 +2,8 @@ package uk.ac.brighton.jh1152.gallioncommanderv1;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
+
 import com.google.zxing.Result;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
@@ -20,7 +22,16 @@ public class QRScanningActivity extends AppCompatActivity implements ZXingScanne
     @Override
     public void handleResult(Result result) {
         String qrCodeText = result.getText();
-        launchLobbyActivity(qrCodeText);
+        // really simple check, could use a regular expression instead
+        if(qrCodeText.length() == 20)
+        {
+            launchLobbyActivity(qrCodeText);
+        }
+        else{
+            onResume();
+            Toast toast = Toast.makeText(this, "Incorrect QR code, scan a lobby code", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
     // make sure scanner exists and set the content to it when resuming
