@@ -22,6 +22,7 @@ public class Boat {
         db = FirebaseFirestore.getInstance();
     }
 
+    // work out which action has changed and trigger display update
     public void setLocalValue(String key, int value){
         BoatAction changingAction = actions.get(key);
         if(changingAction != null){
@@ -29,13 +30,16 @@ public class Boat {
         }
     }
 
+    // commit changes from UI actions to the database
     public boolean setActionValue(String key, int value){
+        // which action has changed
         BoatAction changingAction = actions.get(key);
 
         if(changingAction != null){
+            // set the action value
             changingAction.actionCurrent = value;
+            // commit changes
             setDocumentValue(changingAction);
-
             return changingAction.isActionComplete();
         }
         return false;
@@ -45,7 +49,7 @@ public class Boat {
         return (livesRemaining > 0);
     }
 
-
+    // commit parameterised action to the database
     void setDocumentValue(BoatAction action){
         db.collection(DocumentLocations.BOAT_COLLECTION + "/" + docRef +"/" + DocumentLocations.ACTION_COLLECTION)
                 .document(action.documentReference).update(action.getDocumentValues())
@@ -56,7 +60,7 @@ public class Boat {
                 });
     }
 
-
+    // values that are represented in documents.
     public Map<String, Object> getData(){
         HashMap<String, Object> boatData  = new HashMap<>();
         boatData.put("lives", livesRemaining);

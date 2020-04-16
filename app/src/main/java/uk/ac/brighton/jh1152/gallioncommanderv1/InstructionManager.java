@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Random;
 
 public class InstructionManager {
-
     private HashMap.Entry<String, String> currentInstruction;
     private HashMap<String, String> boatInstructions;
     Random random;
@@ -16,7 +15,7 @@ public class InstructionManager {
         random = new Random();
     }
 
-
+    // either remove or add the action as an instrution depending on its completeness
     public void manageInstructionList(BoatAction action) {
 
         if(action == null) return;
@@ -28,12 +27,13 @@ public class InstructionManager {
         }
     }
 
-
+    // how is the current instruction to be displayed
     public String getCurrentInstructionString(){
         return currentInstruction.getValue();
     }
 
 
+    // remove the action from the instructions list
     private void removeFromInstructions(String actionRef) {
 
         if(boatInstructions.containsKey(actionRef)){
@@ -41,17 +41,12 @@ public class InstructionManager {
         }
     }
 
-
+    //incomplete instruction, add to boat instruction collection
     private void addToInstructions(BoatAction action){
         boatInstructions.put(action.documentReference, action.getInstructionText());
     }
 
-
-    public void clearInstructions(){
-        boatInstructions.clear();
-    }
-
-
+    // role a random instruction for the player to read out
     public void setRandomInstruction(){
         int instructionSize = boatInstructions.entrySet().size();
         if(instructionSize > 0){
@@ -61,6 +56,7 @@ public class InstructionManager {
 
                 if(instructionsIncrementor == randomPosition){
                     currentInstruction = instruction;
+                    return;
                 }
                 instructionsIncrementor++;
             }
@@ -68,21 +64,21 @@ public class InstructionManager {
         }
     }
 
-
-
     public void removeCurrentInstruction(){
         currentInstruction = null;
     }
 
+    // how many actions are left incomplete
     public int getInstructionsSize(){
         return  boatInstructions.entrySet().size();
     }
 
+    // is the instruction allocated
     public boolean hasAnInstruction(){
         return (currentInstruction != null);
     }
 
-
+    // is the action a current instruction
     public boolean isCurrentInstruction(String instructionKey){
         if(currentInstruction == null) return false;
         return (instructionKey == currentInstruction.getKey());

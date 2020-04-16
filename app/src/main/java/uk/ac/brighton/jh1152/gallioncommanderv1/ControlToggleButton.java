@@ -33,6 +33,7 @@ public class ControlToggleButton extends LinearLayout implements ICustomControl{
 
 
 
+    // constructor called by reflection
     public ControlToggleButton(Context context, String name, String[] stateNames, int currentValue) {
         super(context);
         this.name = name;

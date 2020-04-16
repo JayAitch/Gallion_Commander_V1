@@ -94,14 +94,19 @@ public class BoatConnector {
 
                                 for (QueryDocumentSnapshot document: task.getResult()){
 
+                                    // build new actions on the interface based on the document data=
                                     BoatAction tempAction = createActionFromDocumentData(document);
                                     boatActions.put(document.getId(), tempAction);
+
+                                    // either remove or add instruction based on its finished state
                                     manageInstructionList(tempAction);
 
+                                    // only show some of the actions to each player
                                     if(shouldShowActionToPlayer(actionPosition, actionsSize)){
                                         activity.addActionButton(tempAction);// temporary
                                     }
                                     actionPosition++;
+                                    // only trigger the init after this has finished building objects
                                     loadAfterBoatInit(actionsSize, actionPosition);
 
                                 }
@@ -109,6 +114,7 @@ public class BoatConnector {
                         }
                     });
 
+                    // set a local value for the boat
                     currentBoat = new Boat(boatActions, documentID, lives);
 
                 }
@@ -120,11 +126,12 @@ public class BoatConnector {
 
 
     private void createListeners(){
-        // setup something to remove/ add these on pause/play
+        // create a listener for the action collection
         collectionListener = actionCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 for(DocumentChange change: queryDocumentSnapshots.getDocumentChanges()){
+                    // update all clients of any changes  to the actions
                     switch (change.getType()){
                         case MODIFIED:
                             boatActionChangeCallback(change.getDocument());
@@ -133,6 +140,7 @@ public class BoatConnector {
             }
         });
 
+        // listen to life changes on the boat document
         boatListener = boatDocument.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -144,78 +152,84 @@ public class BoatConnector {
     }
 
 
+    // clean up any listeners still running in the background
     public void destroyListeners(){
         boatListener.remove();
         collectionListener.remove();
+        instructionTicker.stopTimer();
     }
 
-
+    // how many actions are left uncomplete
     public int getActionsRemainingAmount(){
         return instructionManager.getInstructionsSize();
     }
 
 
-
+    // only trigger the init after all documents have been read
     private void loadAfterBoatInit(int size, int current){
         if(current == size){
+            // start listening to documents
             createListeners();
+            // get a random instruction for this player
             instructionManager.setRandomInstruction();
+            // start updating
             initInstructionTicker();
             activity.updateUI();
         }
     }
 
 
-    // probably not here
+    // display the chosen instruction and start the updater
     private void initInstructionTicker(){
         instructionTicker.displayInstructionText();
         instructionTicker.startTimer();
     }
 
 
-
+    // only show some actions to the player
     private boolean shouldShowActionToPlayer(int actionPosition, int actionSize){
         boolean isShowingToPlayer = false;
         float actionsPerUSer = actionSize / (float)playerAmnt;
         int activitiesMin = (int)Math.floor(actionsPerUSer * playerPosition);
         int actionMax = (int)Math.floor(activitiesMin + actionsPerUSer);
 
-
+        // make sure every action is shown to at least one player
         if(actionPosition <= actionMax && actionPosition >= activitiesMin){
             isShowingToPlayer = true;
         }
         return isShowingToPlayer;
     }
 
-    // move to action creator
+    // build local value for action document
     private BoatAction createActionFromDocumentData(QueryDocumentSnapshot document){
+        // get from the firebase document
         String name = document.get("name", String.class);
         int target = document.get("target", Integer.class);
         int current = document.get("current", Integer.class);
         String controlType = document.get("type", String.class);
         List<String> states = (List<String>) document.get("states");
         String[] statesArray = states.toArray(new String[states.size()]);
+        // build a new action to represent this document data
         BoatAction boatAction = new BoatAction(name, BoatActionControlType.valueOf(controlType), target, current, document.getId(), statesArray);
         return boatAction;
     }
 
 
+    // callback for any changes made to the parent document
     public void boatActionChangeCallback(QueryDocumentSnapshot documentSnapshot){
 
         currentBoat.setLocalValue(documentSnapshot.getId(), documentSnapshot.get("current", Integer.class));
         manageInstructionList(currentBoat.actions.get(documentSnapshot.getId()));
         activity.updateUI();
 
-        // do this by listening to a value on the document
+        // level is complete trigger a new level load
        if(getBoatState() == boatStates.COMPLETE){
             stopGame();
             formNewLevelActions();
         }
     }
 
-
-    //change this jank into states, might want a class to update the UI centrally
-    // therer are 2 forms of upodates depending on the document change
+    // restart the timer and get a new instruction when the action has been completed
     private void currentInstructionComplete(){
         instructionTicker.stopTimer();
         instructionTicker.displayInstructionText();
@@ -223,6 +237,7 @@ public class BoatConnector {
     }
 
 
+    // an action has been failed, remove a life from the boat document
     private void removeALife() {
         Map<String, Object> boatData = currentBoat.getData();
         boatData.put("lives", FieldValue.increment(-1));
@@ -231,7 +246,7 @@ public class BoatConnector {
 
 
 
-
+    // check boat state and do an action based on the lives/instructions remaining
     public void instructionTimeOut(){
         removeALife();
 
@@ -240,6 +255,7 @@ public class BoatConnector {
                 stopGame();
                 break;
             case TRAVELLING:
+                // get a new instruction for the current player (can be the same one)
                 instructionManager.setRandomInstruction();
                 instructionTicker.displayInstructionText();
                 instructionTicker.startTimer();
@@ -252,16 +268,17 @@ public class BoatConnector {
 
     }
 
-
+    // stop the client from performing timer based updates
     private void stopGame(){
         instructionManager.removeCurrentInstruction();
         instructionTicker.stopTimer();
     }
 
 
-
+    // update instruction list based on whether the action that has changed is now completed
     private void manageInstructionList(BoatAction action) {
             instructionManager.manageInstructionList(action);
+            // this action is complete get a new one
             if (instructionManager.isCurrentInstruction(action.documentReference) && action.isActionComplete()) {
                 instructionManager.setRandomInstruction();
                 currentInstructionComplete();
@@ -269,7 +286,8 @@ public class BoatConnector {
     }
 
 
-
+    // text to display in the instruction ticker
+    // display the state if a new instruction shouldnt be fetched
     public String getCurrentInstructionString(){
 
         switch (getBoatState()){
@@ -291,6 +309,7 @@ public class BoatConnector {
 
     }
 
+    // check all the actions on the boat
     private boolean areAllActionsComplete(){
         boolean isComplete = true;
         for(Map.Entry<String, BoatAction> actionEntry: boatActions.entrySet()){
@@ -302,6 +321,7 @@ public class BoatConnector {
         return isComplete;
     }
 
+    // work out what state the game is in, this is called asyncronously by document updates
    public boatStates getBoatState(){
         boatStates state;
        if(!currentBoat.isBoatAlive()) {
@@ -320,13 +340,14 @@ public class BoatConnector {
 
 
 
-
+    // show level complete dialogue
     private void createLevelCompleteDialogue(){
 
         levelCompleteDialogue = new AlertDialog.Builder(activity)
                 .setTitle("Level Complete").setMessage("Moving on the next level in \n 5").create();
     }
 
+    // use the action creater to generate a brand new set of actions
     private void formNewLevelActions(){
 
         activity.removeAllActionButtons();
@@ -348,24 +369,30 @@ public class BoatConnector {
 
     }
 
+    // trigger the level complete dialogue load new level when time reached
     private void triggerLevelCompleteDialogue(){
+
 
         levelCompleteDialogue.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(final DialogInterface dialogInterface) {
 
                 if(dialogueTimer == null){
+                    // buiild countdown for 5 seconds to alert players to new level
                     dialogueTimer = new CountDownTimer(5000, 1000) {
                         final TextView messageText =  levelCompleteDialogue.findViewById(android.R.id.message);
                         @Override
                         public void onTick(long millisUntilFinished) {
+                            // display the time left in the dialogue
                             int secondsLeft = (int) millisUntilFinished / 1000;
                             messageText.setText("Moving on the next level in " + secondsLeft);
                         }
 
                         @Override
                         public void onFinish() {
+                            // trigger the new level to load
                             triggerNewLevelLoad();
+                            // this is an issue when rotating the screen this will crash the application
                             levelCompleteDialogue.dismiss();
                         }
                     };
@@ -379,6 +406,7 @@ public class BoatConnector {
         levelCompleteDialogue.show();
     }
 
+    // re-form objerct from boat docuent and actions collection
     private void triggerNewLevelLoad(){
 
         formBoatFromDocument(boatDocument.getId());

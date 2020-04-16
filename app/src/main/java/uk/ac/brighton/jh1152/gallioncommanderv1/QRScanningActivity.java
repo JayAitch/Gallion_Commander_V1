@@ -11,17 +11,19 @@ public class QRScanningActivity extends AppCompatActivity implements ZXingScanne
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // create new scanner and set it as the content
         mScannerView = new ZXingScannerView(this);
         setContentView(mScannerView);
-
     }
 
+    // callback from result handler repond to QR code read
     @Override
     public void handleResult(Result result) {
         String qrCodeText = result.getText();
         launchLobbyActivity(qrCodeText);
     }
 
+    // make sure scanner exists and set the content to it when resuming
     @Override
     protected void onResume() {
         super.onResume();
@@ -33,13 +35,14 @@ public class QRScanningActivity extends AppCompatActivity implements ZXingScanne
         mScannerView.startCamera();
     }
 
+    // cleanup scanner if the activity is destroyed
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mScannerView.stopCamera();
     }
 
-
+    // launch lobby activity with the id found
     private void launchLobbyActivity(String documentID){
         Intent intent = new Intent(this, LobbyActivity.class);
         String boatIdMessage = documentID;

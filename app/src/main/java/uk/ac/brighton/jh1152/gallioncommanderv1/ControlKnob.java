@@ -12,7 +12,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -36,7 +35,7 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
         super(context, attrs);
     }
 
-
+    // this constructor is called through reflection
     public ControlKnob(Context context, String name, String[] stateNames, int currentValue) {
         super(context);
         this.name = name;
@@ -48,7 +47,7 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
     }
 
 
-
+    // override draw to also represent the position of state names as labels
     @Override
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
@@ -59,6 +58,7 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
         }
     }
 
+    //  position has already been worked out, draw the state here
     private void drawerTextAt(Canvas canvas,Point pos, String text){
         Paint paint = new Paint();
         Typeface typeface = ResourcesCompat.getFont(getContext(),R.font.anton);
@@ -67,20 +67,22 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.FILL);
         paint.setTextAlign(Paint.Align.CENTER);
-
+        // offset the text by its width
         int xPos = pos.x + (int)(paint.measureText(text,0,text.length())/2) + (int)(paint.getTextSize()/2);
+        //offset the text by its height
         int yPos = (int)(pos.y  + Math.pow(Math.abs((2 * paint.ascent())) + (2 * Math.abs(paint.descent())), 0.5) + paint.getTextSize()*1.5);
         canvas.drawText(text, xPos, yPos, paint);
     }
 
+    // inflate the view to arrage the objects on the screen properly
     private void createViewObjects(){
         LayoutInflater.from(getContext()).inflate(R.layout.control_knob, this);
         nameText = (TextView) findViewById(R.id.nameText);
-        //stateText = (TextView) findViewById(R.id.stateText);
         controlKnob =(ImageView) findViewById(R.id.control_knob);
         nameText.setText(name);
     }
 
+    // set what rotation the knob control shoulbe be at to represent a state
     private void setRotation(int currentValue){
         float progress = ((float)currentValue / (float) stateNames.length);
         float angle =  progress * 360 + angleOffset;
@@ -88,20 +90,24 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
     }
 
 
-    //https://gamedev.stackexchange.com/questions/9607/moving-an-object-in-a-circular-path
+    // calculate where around the knob or the text state should be
     private Point getStatePosition(int stateValue) {
 
         float offset = 22;
 
-        //float radius = (360 / 2) + offset;
-        double rough = Math.pow(controlKnob.getHeight() * controlKnob.getWidth(), 0.5);
-        float radius = (float)(rough / 2) + offset;
+        double diameter = Math.pow(controlKnob.getHeight() * controlKnob.getWidth(), 0.5);
+        float radius = (float)(diameter / 2) + offset;
+        // where the state 0 is represented
         Double startAngle = Math.PI * (9 / 2d);
+
+        // work out how far round the circle this state should be shown
         Double angle =  startAngle + (stateValue * ( (2 * Math.PI) / stateNames.length));
 
+        // work out where the control is
         float xOrigin = controlKnob.getX() + (controlKnob.getWidth() / 2);
         float yOrigin = controlKnob.getY() + (controlKnob.getHeight() / 2);
 
+        // arrange around the control
         int posX  = (int) ((radius * Math.cos(angle)) + xOrigin);
         int posY  = (int) ((radius * Math.sin(angle)) + yOrigin);
         return new Point(posX, posY);
@@ -109,11 +115,13 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
 
 
 
-//https://www.pocketmagic.net/custom-rotary-knob-control-for-android/
+    // triggered by document updates
     public void setCurrentValue(int statePosition){
         setRotation(statePosition);
     }
 
+
+    // work out what the closest state to the touch location the press was made
     private int closestPoint(Point location){
 
         double closetDistance = 10000;
@@ -121,7 +129,6 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
         int incrementor = 0;
         for(Point point : stateLabelPos){
             double distanceBetween = distance(location, point);
-            Log.d("new distances", "<<<<<" + distanceBetween);
             if(distanceBetween < closetDistance){
                 closetDistance = distanceBetween;
                 closetPoint = incrementor;
@@ -133,24 +140,29 @@ public class ControlKnob extends LinearLayout implements ICustomControl {
     }
 
 
-//https://stackoverflow.com/questions/11534323/android-distance-between-two-points
+    // distance calculation
     private double distance(Point a, Point b){
         double distance = Math.sqrt(Math.pow(a.x - b.x,2) + Math.pow(a.y - b.y, 2));
         return distance;
     }
 
-
+    // use control defined by listener to act on user interactions
     @Override
     public void setControlListener(final IControlListener controlListener) {
         this.setOnTouchListener(new OnTouchListener() {
             @Override
              public boolean onTouch(View v, MotionEvent event) {
                 int action = event.getAction();
+                // set new state as the closest to the touch area
                 Point contact = new Point((int)event.getX(), (int)event.getY());
                 int closestState = closestPoint(contact);
                 setCurrentValue(closestState);
+                // call defined listerners with the new state
                 controlListener.onControlChange(closestState);
+                // inact the change
                 controlListener.onControlStopTouch();
+
+                //allow for scroll control whilst touching this card.
                 return true;
 
             }

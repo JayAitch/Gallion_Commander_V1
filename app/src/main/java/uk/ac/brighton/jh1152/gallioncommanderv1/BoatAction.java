@@ -13,7 +13,7 @@ public class BoatAction {
     String states[];
     BoatActionControlType controlType;
 
-
+    // instantiate with local values
     public BoatAction(String name, BoatActionControlType type, int target, int current, String ref, String stateNames[]){
         actionName = name;
         actionTarget = target;
@@ -21,9 +21,9 @@ public class BoatAction {
         documentReference = ref;
         states = stateNames;
         controlType = type;
-
     }
 
+    // document values to be represented on the database
     public Map<String, Object> getDocumentValues(){
         actionDBValues= new HashMap<>();
         actionDBValues.put("name", actionName);
@@ -34,6 +34,7 @@ public class BoatAction {
         return actionDBValues;
     }
 
+    // what is the instruction text to display to the user
     public String getInstructionText(){
         String instructionText;
         String stateText;

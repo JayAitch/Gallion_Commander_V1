@@ -16,7 +16,7 @@ public class ActionCreator {
     private Random random;
     private Activity activity;
 
-
+    // temporary class to store action creation values
     private class PossibleAction{
         public String name;
         public String[] states;
@@ -37,11 +37,11 @@ public class ActionCreator {
     }
 
 
-// https://stackoverflow.com/questions/19945411/android-java-how-can-i-parse-a-local-json-file-from-assets-folder-into-a-listvi/19945484#19945484
-// https://stackoverflow.com/questions/40565078/how-to-add-json-file-to-android-project
+    // use json defined in external file to build list of possible actions
     private String getPossibleActionsFromFile(){
         String possibleActionsString = null;
         try {
+            // use the binnary reader to interpret file as a string
             InputStream inputStream = activity.getAssets().open("possible-actions.json");
             int streamSize = inputStream.available();
             byte[] buffer = new byte[streamSize];
@@ -56,17 +56,25 @@ public class ActionCreator {
 
     private void buildPossibleActions(){
         try {
+            // build possible actions from external file
             JSONArray jsonArray = new JSONArray(getPossibleActionsFromFile());
             possibleActions = new PossibleAction[jsonArray.length()];
+
+            // go through the json and create a list of all the possible actions
             for(int i = 0; i < jsonArray.length(); i++){
-                JSONObject object = jsonArray.getJSONObject(i);
-                JSONArray JSONstates = object.getJSONArray("states");
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                JSONArray JSONstates = jsonObject.getJSONArray("states");
                 String[] states = new String[JSONstates.length()];
+
+                // create an array of states possible actions
                 for(int statesi = 0; statesi < JSONstates.length(); statesi++){
                     states[statesi] = JSONstates.getString(statesi);
                 }
-                String name = object.getString("name");
-                String type = object.getString("type");
+
+                // get the name of the action and the type of control it needs.
+                String name = jsonObject.getString("name");
+                String type = jsonObject.getString("type");
                 BoatActionControlType controlType = BoatActionControlType.valueOf(type);
                 possibleActions[i] = new PossibleAction(name,states, controlType);
 

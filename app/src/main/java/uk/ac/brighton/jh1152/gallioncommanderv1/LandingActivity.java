@@ -34,35 +34,24 @@ public class LandingActivity extends AppCompatActivity {
     }
 
     private void checkCameraPermissions(){
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
-            // Permission is not granted
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.CAMERA)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+                //
             } else {
-                // No explanation needed; request the permission
+                // request the permissing
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.CAMERA},
                         0);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
             }
         } else {
-            // Permission has already been granted
+            // app already has permission
         }
 
     }
 
 
-
+    // build button callbacks
     private void createButtonEvents(){
         hostBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,25 +69,28 @@ public class LandingActivity extends AppCompatActivity {
 
 
 
-
+    // launch the QR scanning activity
     private void launchScanningActivity(){
         Intent intent = new Intent(this, QRScanningActivity.class);
         startActivity(intent);
     }
 
-
+    // build lobby document and trigger lobby activity
     private void hostLobby(){
         Map<String, Object> newLobby = new HashMap<>();
         newLobby.put("players", 0);
+        // query to create a new lobby document
         db.collection(DocumentLocations.LOBBY_COLLECTION).add(newLobby).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
             public void onSuccess(DocumentReference documentReference) {
+                // trigger lobby activity after making database changes
                 launchLobbyActivity(documentReference.getId());
             }
         });
 
     }
 
+    // launch the lobby activity with the new documentID
     private void launchLobbyActivity(String documentID){
 
         Intent intent = new Intent(this, LobbyActivity.class);

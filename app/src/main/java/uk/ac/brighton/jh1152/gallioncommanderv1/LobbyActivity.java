@@ -75,6 +75,7 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
 
+    // query lobby document and generate display
     private void connnectToLobby(){
         lobbyDocument.get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -87,9 +88,13 @@ public class LobbyActivity extends AppCompatActivity {
 
                                 lobbyData = document.getData();
                                 lobbyData.remove("boat");
+                                // asyncronously increment field value
                                 lobbyData.put("players", FieldValue.increment(1));
+                                // commit lobby document cahnges to database
                                 lobbyDocument.update(lobbyData);
+                                // display lobby QR code
                                 generateAndDisplayQRCode(document.getId());
+                                // keep track of player position
                                 thisPlayerNumber = document.get("players", Integer.class);
 
 
@@ -103,6 +108,7 @@ public class LobbyActivity extends AppCompatActivity {
                     }
                 });
 
+        // add a listener to the document for player size changes
         lobbyListener = lobbyDocument.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -113,6 +119,7 @@ public class LobbyActivity extends AppCompatActivity {
 
                 String boatID = documentSnapshot.get("boat", String.class);
 
+                // if the boat has been added to the document trigger game activity
                 if( boatID!= null && boatID.length() == 20){
                     lobbyListener.remove();
                     launchGame(boatID);
@@ -122,7 +129,7 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
 
-
+    // build intent to pass boat document id and launch maingame acvitiy
     private void launchGame(String boatID){
         Intent intent = new Intent(this, MainGameActivity.class);
         String boatIdMessage = boatID;
@@ -132,13 +139,14 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
 
-
+    // keep track of the players that are connected, clean up listners
     private void disconnectFromLobby(){
         lobbyData.put("players", FieldValue.increment(-1));
         lobbyDocument.update(lobbyData);
         lobbyListener.remove();
     }
 
+    // respond to activity lifecyles
     @Override
     protected void onPause() {
         super.onPause();
@@ -162,24 +170,28 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
 
-
+    // generate a new boat object with a set of actions and commit to the database
     private void createNewBoatAndSetReference(){
         Map<String, Object> newBoat = new HashMap<>();
         newBoat.put("lives", GameSettings.BASE_BOAT_LIVES);
         newBoat.put("players", lobbyData.get("players"));
+        // create map of actions
         boatActions = createBoatActionsCollection();
 
         db.collection("boats").add(newBoat).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
             public void onSuccess(DocumentReference documentReference) {
                 newBoatReferenceID = documentReference.getId();
+                // build document location string
                 String boatLocation = DocumentLocations.BOAT_COLLECTION + "/"+ newBoatReferenceID + "/" + DocumentLocations.ACTION_COLLECTION;
                 for(BoatAction action: boatActions){
 
+                    // create new tasks against the boat document
                     db.collection(boatLocation).document(action.documentReference).set(action.getDocumentValues()).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             boatActivityCount++;
+                            // make sure this has finished commiting to the database before adding boat reference to lobby document
                             checkIfFinishedCreatingActions(boatActivityCount);
                         }
                     });
@@ -191,11 +203,13 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
 
+    // display the current lobby as a QR and text
     private void generateAndDisplayQRCode(String code)
     {
         Bitmap qrCodeBitmap;
         MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
         try{
+            // utilise barcode encoder to generate QR bitmap
             BitMatrix bitMatrix = multiFormatWriter.encode(code, BarcodeFormat.QR_CODE, 400, 400);
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             qrCodeBitmap = barcodeEncoder.createBitmap(bitMatrix);
@@ -207,9 +221,9 @@ public class LobbyActivity extends AppCompatActivity {
 
     }
 
-
-    private void checkIfFinishedCreatingActions(int activitiesCount){
-        if(boatActions.length == activitiesCount){
+    // make sure actions have finished comiting before triggering actibity changes
+    private void checkIfFinishedCreatingActions(int actionCount){
+        if(boatActions.length == actionCount){
             lobbyData.put("boat", newBoatReferenceID);
             lobbyDocument.update(lobbyData);
         }

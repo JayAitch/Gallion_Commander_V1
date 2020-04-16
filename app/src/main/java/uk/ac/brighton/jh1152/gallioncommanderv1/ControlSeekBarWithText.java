@@ -29,6 +29,7 @@ public class ControlSeekBarWithText extends LinearLayout implements  ICustomCont
         super(context, attrs, defStyleAttr);
     }
 
+    // this contructor is called through reflection
     public ControlSeekBarWithText(Context context, String name, String[] stateNames, int currentValue) {
         super(context);
         this.name = name;
@@ -37,8 +38,10 @@ public class ControlSeekBarWithText extends LinearLayout implements  ICustomCont
         setCurrentValue(currentValue);
     }
 
+    // inflate the view to display all elements of the card
     private void createViewObjects(){
         LayoutInflater.from(getContext()).inflate(R.layout.action_seek_bar, this);
+        // allocate required views
         nameText = (TextView) findViewById(R.id.nameText);
         stateText = (TextView) findViewById(R.id.stateText);
         seekBar =(SeekBar) findViewById(R.id.seekBar);
@@ -46,11 +49,14 @@ public class ControlSeekBarWithText extends LinearLayout implements  ICustomCont
         nameText.setText(name);
     }
 
+    // update value from external change
     public void setCurrentValue(int statePosition){
         stateText.setText(stateNames[statePosition]);
         seekBar.setProgress(statePosition);
     }
 
+
+    // use control listener to add action to interface actions
     @Override
     public void setControlListener(final IControlListener controlListener) {
 
@@ -58,16 +64,20 @@ public class ControlSeekBarWithText extends LinearLayout implements  ICustomCont
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // change value internally
                 controlListener.onControlChange(progress);
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
+                // trigger any methods that might be needed to show the user has
+                // begun to interact with the element
                 controlListener.onControlStartTouch();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                // notify of any changes to documenets from this interface
                 controlListener.onControlStopTouch();
             }
         });
